@@ -9,6 +9,41 @@ export class GameRoom extends Room<RoomState> {
   onCreate(options: any) {
     this.state = new RoomState();
 
+    //This is the lobby configuration for the game
+    this.onMessage(
+      "startGame",
+      (
+        client,
+        message: {
+          totalRounds: number;
+          answerTimeSeconds: number;
+          prompts: { id: string; subject: string; text: string }[];
+        }
+      ) =>{
+        if (this.state.phase !== "lobby") 
+          return;
+        if (client.sessionId !== this.state.leaderId) 
+          return;
+        if (message.prompts.length === 0) 
+          return;
+
+        this.state.totalRounds = Math.min(message.totalRounds, 26);
+        this.state.answerTimeSeconds = message.answerTimeSeconds;
+
+        this.state.currentPrompts.clear();
+        message.prompts.forEach((prompt) => {
+          const promptSchema = new PromptSchema();
+          promptSchema.id = prompt.id;
+          promptSchema.subject = prompt.subject;
+          promptSchema.text = prompt.text;
+          this.state.currentPrompts.push(promptSchema);
+        });
+
+        this.state.currentRound = 0;
+        this.startRandomizePhase();
+      }
+    );
+
     //This is for checking when player submission and starts round timer
     this.onMessage("submitAnswers", (client, message: {answers: string[]}) =>{
       if (this.state.phase !== "prompt")
@@ -68,8 +103,7 @@ export class GameRoom extends Room<RoomState> {
       } else{
         this.state.currentPromptIndex++;
       }
-  });
-    
+    });
   }
 
   onJoin(client: Client, options: any) {
