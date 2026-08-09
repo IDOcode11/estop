@@ -17,7 +17,7 @@ export default function App() {
 
     return (
         <div>
-            <h1>Estop</h1>
+            <h1 className="text-3xl font-bold text-blue-600">Estop</h1>
             <input 
                 placeholder="Your name"
                 value={name}
