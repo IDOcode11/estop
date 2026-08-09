@@ -28,10 +28,11 @@ export class GameRoom extends Room<RoomState> {
           return;
 
         this.state.totalRounds = Math.min(message.totalRounds, 26);
-        this.state.answerTimeSeconds = message.answerTimeSeconds;
+        this.state.answerTimeSeconds = message.answerTimeSeconds; // Default to 60 seconds
 
         this.state.currentPrompts.clear();
-        message.prompts.forEach((prompt) => {
+
+        message.prompts.forEach( (prompt) =>{
           const promptSchema = new PromptSchema();
           promptSchema.id = prompt.id;
           promptSchema.subject = prompt.subject;
@@ -43,6 +44,17 @@ export class GameRoom extends Room<RoomState> {
         this.startRandomizePhase();
       }
     );
+
+    //This is a leader button interaction to move to prompt phase
+    this.onMessage("revealPrompt", (client) => {
+      if (this.state.phase !== "randomize") 
+        return;
+      
+      if (client.sessionId !== this.state.leaderId) 
+        return;
+
+      this.startPromptPhase();
+    });
 
     //This is for checking when player submission and starts round timer
     this.onMessage("submitAnswers", (client, message: {answers: string[]}) =>{
@@ -103,6 +115,20 @@ export class GameRoom extends Room<RoomState> {
       } else{
         this.state.currentPromptIndex++;
       }
+    });
+
+    //This is a leader button interaction to continue to the next round
+    this.onMessage("continueToNextRound", (client) => {
+      if (this.state.phase !== "results") 
+        return;
+      
+      if (client.sessionId !== this.state.leaderId) 
+        return;
+      
+      if (this.state.currentRound >= this.state.totalRounds) 
+        return;
+
+      this.startNextRound();
     });
   }
 
@@ -174,6 +200,7 @@ export class GameRoom extends Room<RoomState> {
 
   /**
    * Checks if all currently connected players have submitted their answers before the round timer.
+   * If so, then head to next phase.
    */
   private checkAllSubmitted() {
     const connectedPlayerIds = [...this.state.players.entries()]
@@ -182,10 +209,13 @@ export class GameRoom extends Room<RoomState> {
 
     const allSubmitted = connectedPlayerIds.every( (id) => this.state.submissions.has(id));
 
-    if (allSubmitted)
-        this.forceSubmitAndAdvance();
-
+    if (allSubmitted){
+        this.roomTimer?.clear();
+        this.roomTimer = null;
+        this.startScoringPhase();
+    }
   }
+
   /**
    * Clears round timer, forces any submits if necessary, and moves on to the next phase.
    */
@@ -194,7 +224,29 @@ export class GameRoom extends Room<RoomState> {
     this.roomTimer = null;
 
     this.broadcast("forceSubmit");
-    this.startScoringPhase();
+
+    this.clock.setTimeout( () =>{
+      this.fillMissingSubmissions();
+      this.startScoringPhase();
+    }, 2000);
+  }
+
+  private fillMissingSubmissions(){
+    const promptCount = this.state.currentPrompts.length;
+
+    for (const [playerId, player] of this.state.players.entries()) {
+      if (!player.connected) 
+        continue;
+      
+      if (this.state.submissions.has(playerId)) 
+        continue;
+
+      const submission = new SubmissionSchema();
+      for (let i = 0; i < promptCount; i++){
+        submission.answers.push("");
+      }
+      this.state.submissions.set(playerId, submission);
+    }
   }
 
   /**
