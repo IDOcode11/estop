@@ -1,14 +1,30 @@
-import { Room, Client } from "colyseus";
-import { RoomState, Player, PromptSchema } from "./schema/RoomState";
+import { Room, Client, Delayed } from "colyseus";
+import { RoomState, Player, PromptSchema, SubmissionSchema } from "./schema/RoomState";
 
 export class GameRoom extends Room<RoomState> {
   maxClients = 15;
 
+  private roomTimer: Delayed | null = null;
+
   onCreate(options: any) {
-    // Initial state
     this.state = new RoomState();
 
-    // register message handlers (one per client-triggered action)
+    //This is for checking when player submission and starts round timer
+    this.onMessage("submitAnswers", (client, message: {answers: string[]}) =>{
+      if (this.state.phase !== "prompt")
+          return;
+
+      const submission = new SubmissionSchema();
+      message.answers.forEach( (answer) => submission.answers.push(answer));
+      this.state.submissions.set(client.sessionId, submission);
+
+      if(!this.roomTimer){
+        this.roomTimer = this.clock.setTimeout( () =>{ this.forceSubmitAndAdvance(); }, this.state.answerTimeSeconds * 1000);
+      }
+
+      this.checkAllSubmitted();
+    });
+    
   }
 
   onJoin(client: Client, options: any) {
@@ -46,24 +62,80 @@ export class GameRoom extends Room<RoomState> {
     }
   }
 
-  // --- phase transition helpers ---
+  // --- Phase transition helpers ---
 
+  /**
+   * Starts the alhpabet letter randomizer to choose letter for the round.
+   */
   private startRandomizePhase() {
-    // pick a letter not in usedLetters, add it, set phase = "randomize"
+    // Note: I might add Ñ (Alt+165) later depending user feedback
+    const alphapbet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const available = alphapbet.filter(
+      (letter) => !this.state.usedLetters.includes(letter)
+    );
+
+    if (available.length == 0){
+      throw new Error("No more letters remaining, round count should not exceed 26");
+    }
+
+    const roundLetter = available[Math.floor(Math.random() * available.length)];
+
+    this.state.currentLetter = roundLetter;
+    this.state.usedLetters.push(roundLetter);
+    this.state.phase = "randomize";
   }
 
+  /**
+   * Starts the pormpt answering section.
+   */
   private startPromptPhase() {
-    // set phase = "prompt"
+    this.state.phase = "prompt";
   }
 
+  /**
+   * Checks if all currently connected players have submitted their answers before the round timer.
+   */
+  private checkAllSubmitted() {
+    const connectedPlayerIds = [...this.state.players.entries()]
+      .filter( ([,player]) => player.connected)
+      .map( ([id]) => id);
+
+    const allSubmitted = connectedPlayerIds.every( (id) => this.state.submissions.has(id));
+
+    if(allSubmitted)
+        this.forceSubmitAndAdvance();
+
+  }
+  /**
+   * Clears round timer, forces any submits if necessary, and moves on to the next phase.
+   */
+  private forceSubmitAndAdvance(){
+    this.roomTimer?.clear();
+    this.roomTimer = null;
+
+    this.broadcast("forceSubmit");
+    this.startScoringPhase();
+  }
+
+  /**
+   * 
+   */
   private startScoringPhase() {
-    // set phase = "scoring", reset currentPromptIndex and pointsInProgress
+    this.state.currentPromptIndex = 0;
+    this.state.pointsInProgress.clear();
+    this.state.phase = "scoring";
   }
 
+  /**
+   * 
+   */
   private startResultsPhase() {
     // set phase = "results"
   }
 
+  /**
+   * 
+   */
   private startNextRound() {
     // increment currentRound, pick new prompts, go back to startRandomizePhase()
     // or end the game if currentRound >= totalRounds

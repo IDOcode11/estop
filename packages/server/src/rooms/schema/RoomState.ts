@@ -14,6 +14,10 @@ export class PromptSchema extends Schema {
   @type("string") text: string = "";
 }
 
+export class SubmissionSchema extends Schema {
+  @type(["string"]) answers = new ArraySchema<string>();
+}
+
 export class RoomState extends Schema {
   @type("string") phase: string = "lobby";
   @type("string") leaderId: string = "";
@@ -23,6 +27,8 @@ export class RoomState extends Schema {
 
   @type([PromptSchema]) currentPrompts = new ArraySchema<PromptSchema>();
   @type("number") currentPromptIndex: number = 0;
+  @type({ map: SubmissionSchema }) submissions = new MapSchema<SubmissionSchema>();
+  @type("number") answerTimeSeconds: number = 60;
 
   @type("number") currentRound: number = 0;
   @type("number") totalRounds: number = 0;
