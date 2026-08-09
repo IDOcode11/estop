@@ -34,5 +34,5 @@ export class RoomState extends Schema {
   @type("number") totalRounds: number = 0;
 
   @type({ map: Player }) players = new MapSchema<Player>();
-  @type({ map: "number" }) pointsInProgress = new MapSchema<number>();
+  @type({ map: "number" }) pointsInProgress = new MapSchema<number>(); //Points per round
 }

@@ -18,12 +18,57 @@ export class GameRoom extends Room<RoomState> {
       message.answers.forEach( (answer) => submission.answers.push(answer));
       this.state.submissions.set(client.sessionId, submission);
 
-      if(!this.roomTimer){
+      if (!this.roomTimer){
         this.roomTimer = this.clock.setTimeout( () =>{ this.forceSubmitAndAdvance(); }, this.state.answerTimeSeconds * 1000);
       }
 
       this.checkAllSubmitted();
     });
+    
+    //This is for adding points to each player for a prompt
+    this.onMessage("awardPoints", (client, message: {toPlayerId: string; points: number }) =>{
+      if (this.state.phase !== "scoring") 
+        return;
+      
+      if (client.sessionId !== this.state.leaderId) 
+        return;
+
+      this.state.pointsInProgress.set(message.toPlayerId, message.points);
+    });
+
+    /**
+     * This add up the points:
+     *  - pointsInProgress -> roundScore, per prompt
+     *  - roundScore -> totalScore, per round
+     */
+    this.onMessage("continueScoring", (client) => {
+      if (this.state.phase !== "scoring") 
+        return;
+
+      if (client.sessionId !== this.state.leaderId) 
+        return;
+
+      this.state.pointsInProgress.forEach((points, playerId) => {
+        const player = this.state.players.get(playerId);
+        
+        if (player) 
+          player.roundScore += points;
+      });
+
+      this.state.pointsInProgress.clear();
+
+      const isLastPrompt = this.state.currentPromptIndex >= this.state.currentPrompts.length - 1;
+
+      if (isLastPrompt){
+        for (const player of this.state.players.values()){
+          player.totalScore += player.roundScore;
+        }
+
+        this.startResultsPhase();
+      } else{
+        this.state.currentPromptIndex++;
+      }
+  });
     
   }
 
@@ -35,7 +80,7 @@ export class GameRoom extends Room<RoomState> {
     this.state.players.set(client.sessionId, player);
 
     // Assign leader if this is the first player
-    if(!this.state.leaderId){
+    if (!this.state.leaderId){
         this.state.leaderId = client.sessionId;
     }
   }
@@ -44,7 +89,7 @@ export class GameRoom extends Room<RoomState> {
     // Player disconnected 
     const player = this.state.players.get(client.sessionId);
 
-    if(player)
+    if (player)
         player.connected = false;
 
     if (consented){
@@ -86,9 +131,10 @@ export class GameRoom extends Room<RoomState> {
   }
 
   /**
-   * Starts the pormpt answering section.
+   * Starts the prompt answering section and clears previous round answers.
    */
   private startPromptPhase() {
+    this.state.submissions.clear();
     this.state.phase = "prompt";
   }
 
@@ -102,7 +148,7 @@ export class GameRoom extends Room<RoomState> {
 
     const allSubmitted = connectedPlayerIds.every( (id) => this.state.submissions.has(id));
 
-    if(allSubmitted)
+    if (allSubmitted)
         this.forceSubmitAndAdvance();
 
   }
@@ -118,7 +164,8 @@ export class GameRoom extends Room<RoomState> {
   }
 
   /**
-   * 
+   * Starts the scoring process by clearing the previous points for each player
+   * and starting the synced view in the first prompt.
    */
   private startScoringPhase() {
     this.state.currentPromptIndex = 0;
@@ -127,17 +174,28 @@ export class GameRoom extends Room<RoomState> {
   }
 
   /**
-   * 
+   * Starts the view results page
    */
   private startResultsPhase() {
-    // set phase = "results"
+    this.state.phase = "results";
   }
 
   /**
-   * 
+   * Resets the points for the round of each player 
+   * and start the next round if it is not the final round
    */
   private startNextRound() {
-    // increment currentRound, pick new prompts, go back to startRandomizePhase()
-    // or end the game if currentRound >= totalRounds
+    this.state.currentRound++;
+
+    for (const player of this.state.players.values()){
+      player.roundScore = 0;
+    }
+
+    if (this.state.currentRound >= this.state.totalRounds){
+      this.state.phase = "results";
+      return;
+    }
+
+    this.startRandomizePhase();
   }
 }
