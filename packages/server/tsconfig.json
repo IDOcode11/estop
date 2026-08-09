@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2025",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ES2025"],
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
