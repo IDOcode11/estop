@@ -125,7 +125,7 @@ export class GameRoom extends Room<RoomState> {
       if (client.sessionId !== this.state.leaderId) 
         return;
       
-      if (this.state.currentRound >= this.state.totalRounds) 
+      if (this.state.currentRound >= this.state.totalRounds - 1) 
         return;
 
       this.startNextRound();
@@ -163,7 +163,20 @@ export class GameRoom extends Room<RoomState> {
         if(player)
             player.connected = true;
     } catch {
-        this.state.players.delete(client.sessionId);
+        this.removePlayer(client.sessionId);
+    }
+  }
+
+  /**
+   * Removes player from game and changes leader if the leader left
+   * @param sessionId 
+   */
+  private removePlayer(sessionId: string){
+    this.state.players.delete(sessionId);
+
+    if (this.state.leaderId === sessionId){
+        const nextLeader = [...this.state.players.keys()][0];
+        this.state.leaderId = nextLeader ?? "";
     }
   }
 
@@ -212,6 +225,7 @@ export class GameRoom extends Room<RoomState> {
     if (allSubmitted){
         this.roomTimer?.clear();
         this.roomTimer = null;
+        this.fillMissingSubmissions();
         this.startScoringPhase();
     }
   }
@@ -231,13 +245,13 @@ export class GameRoom extends Room<RoomState> {
     }, 2000);
   }
 
+  /**
+   * If a player is disconnected and did not submit, it will fill prompts with blank answers
+   */
   private fillMissingSubmissions(){
     const promptCount = this.state.currentPrompts.length;
 
-    for (const [playerId, player] of this.state.players.entries()) {
-      if (!player.connected) 
-        continue;
-      
+    for (const [playerId] of this.state.players.entries()) {
       if (this.state.submissions.has(playerId)) 
         continue;
 
