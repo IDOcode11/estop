@@ -2,7 +2,7 @@ import { Room, Client, Delayed } from "colyseus";
 import { RoomState, Player, PromptSchema, SubmissionSchema } from "./schema/RoomState";
 
 export class GameRoom extends Room<RoomState> {
-  maxClients = 15;
+  maxClients = 16;
 
   private roomTimer: Delayed | null = null;
 
