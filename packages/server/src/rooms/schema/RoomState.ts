@@ -11,7 +11,6 @@ export class Player extends Schema {
 export class PromptSchema extends Schema {
   @type("string") id: string = "";
   @type("string") subject: string = "";
-  @type("string") text: string = "";
 }
 
 export class SubmissionSchema extends Schema {

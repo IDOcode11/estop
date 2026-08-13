@@ -36,7 +36,6 @@ export class GameRoom extends Room<RoomState> {
           const promptSchema = new PromptSchema();
           promptSchema.id = prompt.id;
           promptSchema.subject = prompt.subject;
-          promptSchema.text = prompt.text;
           this.state.currentPrompts.push(promptSchema);
         });
 

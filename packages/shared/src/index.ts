@@ -8,5 +8,4 @@ export type GamePhase =
 export interface PromptData {
     id: string;
     subject: string;
-    text: string;
 }
