@@ -198,8 +198,7 @@ export class GameRoom extends Room<RoomState> {
     }
   }
 
-  // --- Phase transition helpers ---
-
+  // -------------------------- Phase transition helpers  -------------------------
   /**
    * Starts the alhpabet letter randomizer to choose letter for the round.
    */
