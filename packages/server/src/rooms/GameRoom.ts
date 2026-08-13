@@ -15,6 +15,9 @@ export class GameRoom extends Room<RoomState> {
     this.state = new RoomState();
     this.state.roomCode = registerRoomCode(this.roomId);
 
+    /**
+     * This is the lobby configuration for the game
+     */
     this.onMessage("updateSettings", (client, message: {totalRounds?: number; answerTimeSeconds?: number }) =>{
       if (this.state.phase !== "lobby")
         return;
@@ -25,10 +28,10 @@ export class GameRoom extends Room<RoomState> {
         this.state.totalRounds = Math.min(Math.max(message.totalRounds, 1), 26);
 
       if (message.answerTimeSeconds !== undefined)
-        this.state.answerTimeSeconds = Math.max(message.answerTimeSeconds, 15);
+        this.state.answerTimeSeconds = Math.min(Math.max(message.answerTimeSeconds, 15), 150);
     });
 
-    //This is the lobby configuration for the game
+    //This is the lobby "Start" declaration 
     this.onMessage("startGame", (client) =>{
       if (this.state.phase !== "lobby")
         return;
@@ -82,6 +85,9 @@ export class GameRoom extends Room<RoomState> {
       if (client.sessionId !== this.state.leaderId) 
         return;
 
+      if(![0,5,10].includes(message.points))
+        return;
+
       this.state.pointsInProgress.set(message.toPlayerId, message.points);
     });
 
@@ -131,6 +137,16 @@ export class GameRoom extends Room<RoomState> {
         return;
 
       this.startNextRound();
+    });
+
+    //This is an interaction to end the game early
+    this.onMessage("endGame", (client) =>{
+      if (this.state.phase !== "results")
+        return;
+      if (client.sessionId !== this.state.leaderId)
+        return;
+
+      this.state.phase = "finalResults";
     });
   }
 
@@ -294,7 +310,7 @@ export class GameRoom extends Room<RoomState> {
     }
 
     if (this.state.currentRound >= this.state.totalRounds){
-      this.state.phase = "results";
+      this.state.phase = "finalResults";
       return;
     }
 

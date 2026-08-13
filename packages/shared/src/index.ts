@@ -3,7 +3,8 @@ export type GamePhase =
     | "randomize"
     | "prompt"
     | "scoring"
-    | "results";
+    | "results"
+    | "finalResults";
 
 export interface PromptData {
     id: string;
