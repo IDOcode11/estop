@@ -4,6 +4,7 @@ import { createServer } from "http";
 import { Server } from "colyseus";
 import { monitor } from "@colyseus/monitor";
 import { GameRoom } from "./rooms/GameRoom";
+import { registerRoomCode } from "./data/roomCodes";
 
 const port = Number(process.env.PORT) || 2567;
 
@@ -19,6 +20,15 @@ gameServer.define("game_room", GameRoom);
 app.use("/colyseus", monitor());
 
 app.get("/health", (_req, res) => res.json({ ok: true}));
+
+app.get("/rooms/:code", (req, res) =>{
+    const roomId = req.params.code;
+
+    if (!roomId)
+      return res.status(404).json({ error: "Room not found"});
+    
+    res.json({ roomId });
+});
 
 gameServer.listen(port);
 console.log(`Colyseus server listening on ws://localhost:${port}`);

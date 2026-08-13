@@ -1,42 +1,36 @@
 import { Room, Client, Delayed } from "colyseus";
 import { RoomState, Player, PromptSchema, SubmissionSchema } from "./schema/RoomState";
+import { PROMPT_BANK } from "../data/promptBank";
+import { registerRoomCode } from "../data/roomCodes";
 
 export class GameRoom extends Room<RoomState> {
   maxClients = 16;
 
+
+
   private roomTimer: Delayed | null = null;
+
 
   onCreate(options: any) {
     this.state = new RoomState();
+    this.state.roomCode = registerRoomCode(this.roomId);
 
     //This is the lobby configuration for the game
-    this.onMessage(
-      "startGame",
-      (
-        client,
-        message: {
-          totalRounds: number;
-          answerTimeSeconds: number;
-          prompts: { id: string; subject: string; text: string }[];
-        }
-      ) =>{
-        if (this.state.phase !== "lobby") 
+    this.onMessage("startGame", (client, message: { totalRounds: number; answerTimeSeconds: number }) => {
+        if (this.state.phase !== "lobby")
           return;
-        if (client.sessionId !== this.state.leaderId) 
-          return;
-        if (message.prompts.length === 0) 
+        if (client.sessionId !== this.state.leaderId)
           return;
 
         this.state.totalRounds = Math.min(message.totalRounds, 26);
-        this.state.answerTimeSeconds = message.answerTimeSeconds; // Default to 60 seconds
+        this.state.answerTimeSeconds = message.answerTimeSeconds;
 
         this.state.currentPrompts.clear();
-
-        message.prompts.forEach( (prompt) =>{
-          const promptSchema = new PromptSchema();
-          promptSchema.id = prompt.id;
-          promptSchema.subject = prompt.subject;
-          this.state.currentPrompts.push(promptSchema);
+        PROMPT_BANK.forEach((prompt) =>{
+            const promptSchema = new PromptSchema();
+            promptSchema.id = prompt.id;
+            promptSchema.subject = prompt.subject;
+            this.state.currentPrompts.push(promptSchema);
         });
 
         this.state.currentRound = 0;

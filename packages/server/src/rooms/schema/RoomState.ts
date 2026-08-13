@@ -20,6 +20,7 @@ export class SubmissionSchema extends Schema {
 export class RoomState extends Schema {
   @type("string") phase: string = "lobby";
   @type("string") leaderId: string = "";
+  @type("string") roomCode: string = "";
 
   @type("string") currentLetter: string = "";
   @type(["string"]) usedLetters = new ArraySchema<string>();
