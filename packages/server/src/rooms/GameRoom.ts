@@ -15,31 +15,40 @@ export class GameRoom extends Room<RoomState> {
     this.state = new RoomState();
     this.state.roomCode = registerRoomCode(this.roomId);
 
+    this.onMessage("updateSettings", (client, message: {totalRounds?: number; answerTimeSeconds?: number }) =>{
+      if (this.state.phase !== "lobby")
+        return;
+      if (client.sessionId !== this.state.leaderId)
+        return;
+
+      if (message.totalRounds !== undefined)
+        this.state.totalRounds = Math.min(Math.max(message.totalRounds, 1), 26);
+
+      if (message.answerTimeSeconds !== undefined)
+        this.state.answerTimeSeconds = Math.max(message.answerTimeSeconds, 15);
+    });
+
     //This is the lobby configuration for the game
-    this.onMessage("startGame", (client, message: { totalRounds: number; answerTimeSeconds: number }) => {
-        if (this.state.phase !== "lobby")
-          return;
-        if (client.sessionId !== this.state.leaderId)
-          return;
+    this.onMessage("startGame", (client) =>{
+      if (this.state.phase !== "lobby")
+        return;
+      if (client.sessionId !== this.state.leaderId)
+        return;
 
-        this.state.totalRounds = Math.min(message.totalRounds, 26);
-        this.state.answerTimeSeconds = message.answerTimeSeconds;
+      this.state.currentPrompts.clear();
+      PROMPT_BANK.forEach((prompt) =>{
+          const promptSchema = new PromptSchema();
+          promptSchema.id = prompt.id;
+          promptSchema.subject = prompt.subject;
+          this.state.currentPrompts.push(promptSchema);
+      });
 
-        this.state.currentPrompts.clear();
-        PROMPT_BANK.forEach((prompt) =>{
-            const promptSchema = new PromptSchema();
-            promptSchema.id = prompt.id;
-            promptSchema.subject = prompt.subject;
-            this.state.currentPrompts.push(promptSchema);
-        });
-
-        this.state.currentRound = 0;
-        this.startRandomizePhase();
-      }
-    );
+      this.state.currentRound = 0;
+      this.startRandomizePhase();
+    });
 
     //This is a leader button interaction to move to prompt phase
-    this.onMessage("revealPrompt", (client) => {
+    this.onMessage("revealPrompts", (client) => {
       if (this.state.phase !== "randomize") 
         return;
       
