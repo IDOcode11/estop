@@ -1,6 +1,6 @@
 import { Room } from "colyseus.js";
-import { RoomStateShape } from "../../shared/src";
-import { useGameState } from "./useGameState";
+import { RoomStateShape } from "../../../shared/src";
+import { useGameState } from "../hooks/useGameState";
 
 interface LobbyScreenProps{
     room: Room<RoomStateShape>;

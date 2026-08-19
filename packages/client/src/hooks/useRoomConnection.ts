@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { Client, Room } from "colyseus.js";
-import { RoomStateShape } from "../../shared/src";
+import { RoomStateShape } from "../../../shared/src";
 
 const SERVER_URL = "ws://localhost:2567"; //Used as WebSocket for Colyseus
 const HTTP_URL = "http://localhost:2567"; //Used as RESTful call

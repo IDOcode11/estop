@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Room } from "colyseus.js";
-import { RoomStateShape } from "../../shared/src/types"
+import { RoomStateShape } from "../../../shared/src/types"
 
 export function useGameState(room: Room<RoomStateShape> | null) {
   const [, forceUpdate] = useState(0);

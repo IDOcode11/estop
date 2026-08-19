@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useRoomConnection } from "./useRoomConnection";
-import JoinScreen from "./JoinScreen";
-import LobbyScreen from "./LobbyScreen";
+import { useRoomConnection } from "./hooks/useRoomConnection";
+import JoinScreen from "./screens/JoinScreen";
+import LobbyScreen from "./screens/LobbyScreen";
 
 
 export default function App() {
