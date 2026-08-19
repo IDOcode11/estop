@@ -22,7 +22,7 @@ app.use("/colyseus", monitor());
 app.get("/health", (_req, res) => res.json({ ok: true}));
 
 app.get("/rooms/:code", (req, res) =>{
-    const roomId = req.params.code;
+    const roomId = registerRoomCode(req.params.code);
 
     if (!roomId)
       return res.status(404).json({ error: "Room not found"});
