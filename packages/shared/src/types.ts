@@ -1,5 +1,6 @@
 import { GamePhase } from "./index";
 
+//This file mirror the same layout as RoomState on the server side
 export interface PlayerState {
   name: string;
   totalScore: number;
