@@ -1,5 +1,5 @@
 import { Room } from "colyseus.js";
-import { RoomStateShape } from "../../../shared/src";
+import { RoomStateShape } from "shared";
 import { useGameState } from "../hooks/useGameState";
 
 interface LobbyScreenProps{
@@ -41,7 +41,7 @@ export default function LobbyScreen( {room}: LobbyScreenProps){
                         value={state.totalRounds}
                         disabled={!isLeader}
                         onChange={(e) => room.send("updateSettings", { totalRounds: Number(e.target.value) })}
-                        className="w-24 text-center rounded p-2 disabled:opacity-60"
+                        className="w-24 bg-emerald-400 text-center rounded p-2 disabled:opacity-60"
                     />
                 </label>
 
@@ -54,7 +54,7 @@ export default function LobbyScreen( {room}: LobbyScreenProps){
                         value={state.answerTimeSeconds}
                         disabled={!isLeader}
                         onChange={(e) => room.send("updateSettings", { answerTimeSeconds: Number(e.target.value) })}
-                        className="w-24 text-center rounded p-2 disabled:opacity-60"
+                        className="w-24 bg-emerald-400 text-center rounded p-2 disabled:opacity-60"
                     />
                 </label>
             </div>

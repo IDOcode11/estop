@@ -5,19 +5,13 @@ import { registerRoomCode } from "../data/roomCodes";
 
 export class GameRoom extends Room<RoomState> {
   maxClients = 16;
-
-
-
   private roomTimer: Delayed | null = null;
-
 
   onCreate(options: any) {
     this.state = new RoomState();
     this.state.roomCode = registerRoomCode(this.roomId);
 
-    /**
-     * This is the lobby configuration for the game
-     */
+    //This is the lobby configuration for the game
     this.onMessage("updateSettings", (client, message: {totalRounds?: number; answerTimeSeconds?: number }) =>{
       if (this.state.phase !== "lobby")
         return;
@@ -64,7 +58,7 @@ export class GameRoom extends Room<RoomState> {
     //This is for checking when player submission and starts round timer
     this.onMessage("submitAnswers", (client, message: {answers: string[]}) =>{
       if (this.state.phase !== "prompt")
-          return;
+        return;
 
       const submission = new SubmissionSchema();
       message.answers.forEach( (answer) => submission.answers.push(answer));
@@ -159,7 +153,7 @@ export class GameRoom extends Room<RoomState> {
 
     // Assign leader if this is the first player
     if (!this.state.leaderId){
-        this.state.leaderId = client.sessionId;
+      this.state.leaderId = client.sessionId;
     }
   }
 
@@ -198,7 +192,7 @@ export class GameRoom extends Room<RoomState> {
     }
   }
 
-  // -------------------------- Phase transition helpers  -------------------------
+// -------------------------- Phase transition helpers  -------------------------
   /**
    * Starts the alhpabet letter randomizer to choose letter for the round.
    */

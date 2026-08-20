@@ -16,6 +16,7 @@ export function useRoomConnection() {
     setError(null);
     try {
       const joinedRoom = await clientRef.current.create<RoomStateShape>("game_room", { name });
+      joinedRoom.onLeave(() => setRoom(null));
       setRoom(joinedRoom);
       return joinedRoom;
     } catch (err) {
@@ -37,8 +38,9 @@ export function useRoomConnection() {
       const { roomId } = await res.json();
       
       const joinedRoom = await clientRef.current.joinById<RoomStateShape>(roomId, {name});
+      joinedRoom.onLeave(() => setRoom(null));
       setRoom(joinedRoom);
-
+      
       return joinedRoom;
     } catch (err) {
       setError((err as Error).message);
