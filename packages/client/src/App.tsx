@@ -4,7 +4,7 @@ import { useGameState } from "./hooks/useGameState";
 import JoinScreen from "./screens/JoinScreen";
 import LobbyScreen from "./screens/LobbyScreen";
 import RandomizeScreen from "./screens/RandomizeScreen";
-// import PromptScreen from "./screens/PromptScreen";
+import PromptScreen from "./screens/PromptScreen";
 // import ScoringScreen from "./screens/ScoringScreen";
 // import ResultsScreen from "./screens/ResultsScreen";
 // import FinalResultsScreen from "./screens/FinalResultsScreen";
@@ -40,7 +40,7 @@ export default function App() {
         case "randomize":
             return <RandomizeScreen room={room}/>;
         case "prompt":
-        //     return <PromptScreen room={room}/>;
+            return <PromptScreen room={room}/>;
         case "scoring":
         //     return <ScoringScreen room={room}/>;
         case "results":
