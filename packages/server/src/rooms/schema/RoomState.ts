@@ -11,7 +11,6 @@ export class Player extends Schema {
 export class PromptSchema extends Schema {
   @type("string") id: string = "";
   @type("string") subject: string = "";
-  @type("string") text: string = "";
 }
 
 export class SubmissionSchema extends Schema {
@@ -21,6 +20,7 @@ export class SubmissionSchema extends Schema {
 export class RoomState extends Schema {
   @type("string") phase: string = "lobby";
   @type("string") leaderId: string = "";
+  @type("string") roomCode: string = "";
 
   @type("string") currentLetter: string = "";
   @type(["string"]) usedLetters = new ArraySchema<string>();
@@ -28,10 +28,11 @@ export class RoomState extends Schema {
   @type([PromptSchema]) currentPrompts = new ArraySchema<PromptSchema>();
   @type("number") currentPromptIndex: number = 0;
   @type({ map: SubmissionSchema }) submissions = new MapSchema<SubmissionSchema>();
-  @type("number") answerTimeSeconds: number = 60;
+  @type("number") answerTimeSeconds: number = 30;
+  @type("number") timerEndsAt: number = 0;
 
   @type("number") currentRound: number = 0;
-  @type("number") totalRounds: number = 0;
+  @type("number") totalRounds: number = 1;
 
   @type({ map: Player }) players = new MapSchema<Player>();
   @type({ map: "number" }) pointsInProgress = new MapSchema<number>(); //Points per round

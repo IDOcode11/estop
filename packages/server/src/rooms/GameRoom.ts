@@ -1,52 +1,51 @@
 import { Room, Client, Delayed } from "colyseus";
 import { RoomState, Player, PromptSchema, SubmissionSchema } from "./schema/RoomState";
+import { PROMPT_BANK } from "../data/promptBank";
+import { registerRoomCode } from "../data/roomCodes";
 
 export class GameRoom extends Room<RoomState> {
-  maxClients = 15;
-
+  maxClients = 16;
   private roomTimer: Delayed | null = null;
 
   onCreate(options: any) {
     this.state = new RoomState();
+    this.state.roomCode = registerRoomCode(this.roomId);
 
     //This is the lobby configuration for the game
-    this.onMessage(
-      "startGame",
-      (
-        client,
-        message: {
-          totalRounds: number;
-          answerTimeSeconds: number;
-          prompts: { id: string; subject: string; text: string }[];
-        }
-      ) =>{
-        if (this.state.phase !== "lobby") 
-          return;
-        if (client.sessionId !== this.state.leaderId) 
-          return;
-        if (message.prompts.length === 0) 
-          return;
+    this.onMessage("updateSettings", (client, message: {totalRounds?: number; answerTimeSeconds?: number }) =>{
+      if (this.state.phase !== "lobby")
+        return;
+      if (client.sessionId !== this.state.leaderId)
+        return;
 
-        this.state.totalRounds = Math.min(message.totalRounds, 26);
-        this.state.answerTimeSeconds = message.answerTimeSeconds; // Default to 60 seconds
+      if (message.totalRounds !== undefined)
+        this.state.totalRounds = Math.min(Math.max(message.totalRounds, 1), 26);
 
-        this.state.currentPrompts.clear();
+      if (message.answerTimeSeconds !== undefined)
+        this.state.answerTimeSeconds = Math.min(Math.max(message.answerTimeSeconds, 10), 60);
+    });
 
-        message.prompts.forEach( (prompt) =>{
+    //This is the lobby "Start" declaration 
+    this.onMessage("startGame", (client) =>{
+      if (this.state.phase !== "lobby")
+        return;
+      if (client.sessionId !== this.state.leaderId)
+        return;
+
+      this.state.currentPrompts.clear();
+      PROMPT_BANK.forEach((prompt) =>{
           const promptSchema = new PromptSchema();
           promptSchema.id = prompt.id;
           promptSchema.subject = prompt.subject;
-          promptSchema.text = prompt.text;
           this.state.currentPrompts.push(promptSchema);
-        });
+      });
 
-        this.state.currentRound = 0;
-        this.startRandomizePhase();
-      }
-    );
+      this.state.currentRound = 0;
+      this.startRandomizePhase();
+    });
 
     //This is a leader button interaction to move to prompt phase
-    this.onMessage("revealPrompt", (client) => {
+    this.onMessage("revealPrompts", (client) => {
       if (this.state.phase !== "randomize") 
         return;
       
@@ -59,13 +58,14 @@ export class GameRoom extends Room<RoomState> {
     //This is for checking when player submission and starts round timer
     this.onMessage("submitAnswers", (client, message: {answers: string[]}) =>{
       if (this.state.phase !== "prompt")
-          return;
+        return;
 
       const submission = new SubmissionSchema();
       message.answers.forEach( (answer) => submission.answers.push(answer));
       this.state.submissions.set(client.sessionId, submission);
 
       if (!this.roomTimer){
+        this.state.timerEndsAt = Date.now() + this.state.answerTimeSeconds * 1000;
         this.roomTimer = this.clock.setTimeout( () =>{ this.forceSubmitAndAdvance(); }, this.state.answerTimeSeconds * 1000);
       }
 
@@ -78,6 +78,9 @@ export class GameRoom extends Room<RoomState> {
         return;
       
       if (client.sessionId !== this.state.leaderId) 
+        return;
+
+      if(![0,5,10].includes(message.points))
         return;
 
       this.state.pointsInProgress.set(message.toPlayerId, message.points);
@@ -130,6 +133,39 @@ export class GameRoom extends Room<RoomState> {
 
       this.startNextRound();
     });
+
+    //This is an interaction to end the game early
+    this.onMessage("endGame", (client) =>{
+      if (this.state.phase !== "results")
+        return;
+      if (client.sessionId !== this.state.leaderId)
+        return;
+
+      this.state.phase = "finalResults";
+    });
+
+    //This is an interaction to return to the lobby
+    this.onMessage("returnToLobby", (client) => {
+      if (this.state.phase !== "finalResults")
+        return;
+      if (client.sessionId !== this.state.leaderId)
+        return;
+
+      this.state.currentRound = 0;
+      this.state.currentPromptIndex = 0;
+      this.state.currentLetter = "";
+      this.state.usedLetters.clear();
+      this.state.submissions.clear();
+      this.state.pointsInProgress.clear();
+      this.state.timerEndsAt = 0;
+
+      for (const player of this.state.players.values()){
+        player.totalScore = 0;
+        player.roundScore = 0;
+      }
+      
+      this.state.phase = "lobby";
+    });
   }
 
   onJoin(client: Client, options: any) {
@@ -141,7 +177,7 @@ export class GameRoom extends Room<RoomState> {
 
     // Assign leader if this is the first player
     if (!this.state.leaderId){
-        this.state.leaderId = client.sessionId;
+      this.state.leaderId = client.sessionId;
     }
   }
 
@@ -180,8 +216,7 @@ export class GameRoom extends Room<RoomState> {
     }
   }
 
-  // --- Phase transition helpers ---
-
+// -------------------------- Phase transition helpers  -------------------------
   /**
    * Starts the alhpabet letter randomizer to choose letter for the round.
    */
@@ -208,6 +243,7 @@ export class GameRoom extends Room<RoomState> {
    */
   private startPromptPhase() {
     this.state.submissions.clear();
+    this.state.timerEndsAt = 0;
     this.state.phase = "prompt";
   }
 
@@ -292,7 +328,7 @@ export class GameRoom extends Room<RoomState> {
     }
 
     if (this.state.currentRound >= this.state.totalRounds){
-      this.state.phase = "results";
+      this.state.phase = "finalResults";
       return;
     }
 

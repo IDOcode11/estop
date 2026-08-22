@@ -1,40 +1,53 @@
 import { useState } from "react";
-import { useRoomConnection } from "./useRoomConnection";
+import { useRoomConnection } from "./hooks/useRoomConnection";
+import { useGameState } from "./hooks/useGameState";
+import JoinScreen from "./screens/JoinScreen";
+import LobbyScreen from "./screens/LobbyScreen";
+import RandomizeScreen from "./screens/RandomizeScreen";
+import PromptScreen from "./screens/PromptScreen";
+import ScoringScreen from "./screens/ScoringScreen";
+import ResultsScreen from "./screens/ResultsScreen";
+import FinalResultsScreen from "./screens/FinalResultsScreen";
 
 export default function App() {
     const { room, connecting, error, createRoom, joinRoom } = useRoomConnection();
     const [name, setName] = useState("");
-    const [roomId, setRoomId] = useState("");
+    const state = useGameState(room);
 
-    if(room){
+    if (!room) {
         return (
-            <div>
-                <h1>Connected to room: {room.roomId}</h1>
-                <p>You are: {name}</p>
-            </div>
+            <JoinScreen
+                connecting={connecting}
+                error={error}
+                onCreate={(n) => {
+                    setName(n);
+                    createRoom(n);
+                }}
+                onJoin={(code, n) => {
+                    setName(n);
+                    joinRoom(code, n);
+                }}
+            />
         );
     }
 
-    return (
-        <div>
-            <h1 className="text-3xl font-bold text-blue-600">Estop</h1>
-            <input 
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-            />
-            <div>
-                <button disabled={!name || connecting} onClick={() => createRoom(name)}> Create Room </button>
-            </div>
-            <div>
-                <input 
-                placeholder="Room ID"
-                value={roomId}
-                onChange={(e) => setRoomId(e.target.value)}
-                />
-                <button disabled={!name || !roomId || connecting} onClick={() => joinRoom(roomId, name)}> Join Room </button>
-            </div>
-            {error && <p style={{color: "red"}}> {error} </p>}
-        </div>
-    );
+    if (!state)
+      return null;
+
+    switch (state.phase){
+        case "lobby":
+            return <LobbyScreen room={room}/>;
+        case "randomize":
+            return <RandomizeScreen room={room}/>;
+        case "prompt":
+            return <PromptScreen room={room}/>;
+        case "scoring":
+            return <ScoringScreen room={room}/>;
+        case "results":
+            return <ResultsScreen room={room}/>;
+        case "finalResults":
+            return <FinalResultsScreen room={room}/>;
+        default:
+            return <LobbyScreen room={room}/>;
+    } 
 }
