@@ -4,7 +4,7 @@ import { createServer } from "http";
 import { Server } from "colyseus";
 import { monitor } from "@colyseus/monitor";
 import { GameRoom } from "./rooms/GameRoom";
-import { registerRoomCode } from "./data/roomCodes";
+import { resolveRoomCode } from "./data/roomCodes";
 
 const port = Number(process.env.PORT) || 2567;
 
@@ -22,7 +22,7 @@ app.use("/colyseus", monitor());
 app.get("/health", (_req, res) => res.json({ ok: true}));
 
 app.get("/rooms/:code", (req, res) =>{
-    const roomId = registerRoomCode(req.params.code);
+    const roomId = resolveRoomCode(req.params.code);
 
     if (!roomId)
       return res.status(404).json({ error: "Room not found"});
