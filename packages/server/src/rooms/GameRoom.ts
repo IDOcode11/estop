@@ -65,6 +65,7 @@ export class GameRoom extends Room<RoomState> {
       this.state.submissions.set(client.sessionId, submission);
 
       if (!this.roomTimer){
+        this.state.timerEndsAt = Date.now() + this.state.answerTimeSeconds * 1000;
         this.roomTimer = this.clock.setTimeout( () =>{ this.forceSubmitAndAdvance(); }, this.state.answerTimeSeconds * 1000);
       }
 
@@ -219,6 +220,7 @@ export class GameRoom extends Room<RoomState> {
    */
   private startPromptPhase() {
     this.state.submissions.clear();
+    this.state.timerEndsAt = 0;
     this.state.phase = "prompt";
   }
 

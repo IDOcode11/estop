@@ -9,8 +9,6 @@ import RandomizeScreen from "./screens/RandomizeScreen";
 // import ResultsScreen from "./screens/ResultsScreen";
 // import FinalResultsScreen from "./screens/FinalResultsScreen";
 
-
-
 export default function App() {
     const { room, connecting, error, createRoom, joinRoom } = useRoomConnection();
     const [name, setName] = useState("");

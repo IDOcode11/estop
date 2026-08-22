@@ -31,6 +31,7 @@ export interface RoomStateShape {
   currentRound: number;
   totalRounds: number;
   answerTimeSeconds: number;
+  timerEndsAt: number;
 
   players: Map<string, PlayerState>;
   submissions: Map<string, SubmissionState>;
