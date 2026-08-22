@@ -38,6 +38,11 @@ export default function ResultsScreen({ room }: ResultsScreenProps){
             </div>
             {isLeader && (
                 <div className="flex gap-4">
+                    <button
+                        onClick={() => room.send("endGame")}
+                        className="bg-purple-400 px-6 py-3 rounded-lg font-bold text-gray-800">
+                        End Game
+                    </button>
                     {!isFinalRound && (
                         <button
                             onClick={() => room.send("continueToNextRound")}
@@ -45,11 +50,6 @@ export default function ResultsScreen({ room }: ResultsScreenProps){
                             Next Round
                         </button>
                     )}
-                    <button
-                        onClick={() => room.send("endGame")}
-                        className="bg-purple-400 px-6 py-3 rounded-lg font-bold text-gray-800">
-                        End Game
-                    </button>
                 </div>
             )}
         </div>

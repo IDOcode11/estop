@@ -115,7 +115,7 @@ export default function PromptScreen({ room }: PromptScreenProps){
                     ‹
                 </button>
                 <div className="flex-1 bg-yellow-100 rounded-lg p-6 flex flex-col gap-4">
-                    <div className="bg-purple-300 rounded-lg px-4 py-2 font-bold text-gray-800 self-start">
+                    <div className="bg-purple-300 rounded-lg px-4 py-2 font-bold text-gray-800 self-center-safe">
                         {prompt.subject}
                     </div>
                     <input

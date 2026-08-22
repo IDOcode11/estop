@@ -32,7 +32,7 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
                 {state.currentLetter}
             </div>
             <div className="w-full max-w-2xl bg-orange-300 rounded-lg p-4 flex flex-col gap-3">
-                <div className="bg-yellow-100 rounded-lg px-4 py-2 font-bold text-gray-800 self-start">
+                <div className="bg-yellow-100 rounded-lg px-4 py-2 font-bold text-gray-800 self-center-safe">
                     {prompt.subject}
                 </div>
                 <div className="bg-cyan-400 rounded-lg p-3 flex flex-col gap-2">
