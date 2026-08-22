@@ -6,8 +6,8 @@ import LobbyScreen from "./screens/LobbyScreen";
 import RandomizeScreen from "./screens/RandomizeScreen";
 import PromptScreen from "./screens/PromptScreen";
 import ScoringScreen from "./screens/ScoringScreen";
-// import ResultsScreen from "./screens/ResultsScreen";
-// import FinalResultsScreen from "./screens/FinalResultsScreen";
+import ResultsScreen from "./screens/ResultsScreen";
+import FinalResultsScreen from "./screens/FinalResultsScreen";
 
 export default function App() {
     const { room, connecting, error, createRoom, joinRoom } = useRoomConnection();
@@ -44,9 +44,9 @@ export default function App() {
         case "scoring":
             return <ScoringScreen room={room}/>;
         case "results":
-        //     return <ResultsScreen room={room}/>;
+            return <ResultsScreen room={room}/>;
         case "finalResults":
-        //     return <FinalResultsScreen room={room}/>;
+            return <FinalResultsScreen room={room}/>;
         default:
             return <LobbyScreen room={room}/>;
     } 

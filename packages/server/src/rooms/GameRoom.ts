@@ -143,6 +143,29 @@ export class GameRoom extends Room<RoomState> {
 
       this.state.phase = "finalResults";
     });
+
+    //This is an interaction to return to the lobby
+    this.onMessage("returnToLobby", (client) => {
+      if (this.state.phase !== "finalResults")
+        return;
+      if (client.sessionId !== this.state.leaderId)
+        return;
+
+      this.state.currentRound = 0;
+      this.state.currentPromptIndex = 0;
+      this.state.currentLetter = "";
+      this.state.usedLetters.clear();
+      this.state.submissions.clear();
+      this.state.pointsInProgress.clear();
+      this.state.timerEndsAt = 0;
+
+      for (const player of this.state.players.values()){
+        player.totalScore = 0;
+        player.roundScore = 0;
+      }
+      
+      this.state.phase = "lobby";
+    });
   }
 
   onJoin(client: Client, options: any) {
