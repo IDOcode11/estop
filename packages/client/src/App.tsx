@@ -5,7 +5,7 @@ import JoinScreen from "./screens/JoinScreen";
 import LobbyScreen from "./screens/LobbyScreen";
 import RandomizeScreen from "./screens/RandomizeScreen";
 import PromptScreen from "./screens/PromptScreen";
-// import ScoringScreen from "./screens/ScoringScreen";
+import ScoringScreen from "./screens/ScoringScreen";
 // import ResultsScreen from "./screens/ResultsScreen";
 // import FinalResultsScreen from "./screens/FinalResultsScreen";
 
@@ -42,7 +42,7 @@ export default function App() {
         case "prompt":
             return <PromptScreen room={room}/>;
         case "scoring":
-        //     return <ScoringScreen room={room}/>;
+            return <ScoringScreen room={room}/>;
         case "results":
         //     return <ResultsScreen room={room}/>;
         case "finalResults":
