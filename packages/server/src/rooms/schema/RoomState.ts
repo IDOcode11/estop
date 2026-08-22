@@ -28,7 +28,7 @@ export class RoomState extends Schema {
   @type([PromptSchema]) currentPrompts = new ArraySchema<PromptSchema>();
   @type("number") currentPromptIndex: number = 0;
   @type({ map: SubmissionSchema }) submissions = new MapSchema<SubmissionSchema>();
-  @type("number") answerTimeSeconds: number = 60;
+  @type("number") answerTimeSeconds: number = 30;
   @type("number") timerEndsAt: number = 0;
 
   @type("number") currentRound: number = 0;

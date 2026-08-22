@@ -22,7 +22,7 @@ export class GameRoom extends Room<RoomState> {
         this.state.totalRounds = Math.min(Math.max(message.totalRounds, 1), 26);
 
       if (message.answerTimeSeconds !== undefined)
-        this.state.answerTimeSeconds = Math.min(Math.max(message.answerTimeSeconds, 15), 150);
+        this.state.answerTimeSeconds = Math.min(Math.max(message.answerTimeSeconds, 10), 60);
     });
 
     //This is the lobby "Start" declaration 
