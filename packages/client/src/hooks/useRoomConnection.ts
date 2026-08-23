@@ -24,7 +24,12 @@ export function useRoomConnection() {
     setRoom(joinedRoom);
   }, []);
 
+  const attemptedReconnect = useRef(false);
   useEffect(() => {
+    if (attemptedReconnect.current)
+      return;
+    attemptedReconnect.current = true;
+
     const savedToken = localStorage.getItem(RECONNECT_KEY);
     if (!savedToken){
       setReconnecting(false);
@@ -34,7 +39,7 @@ export function useRoomConnection() {
     clientRef.current
       .reconnect<RoomStateShape>(savedToken)
       .then((joinedRoom) => attachRoom(joinedRoom))
-      .catch(() =>{ localStorage.removeItem(RECONNECT_KEY) })
+      .catch(() =>{ localStorage.removeItem(RECONNECT_KEY); })
       .finally(() => setReconnecting(false));
     
   }, [attachRoom]);
@@ -79,6 +84,7 @@ export function useRoomConnection() {
 
   const leaveRoom = useCallback(() => {
     localStorage.removeItem(RECONNECT_KEY);
+    localStorage.removeItem("estop_prompt_draft");
     room?.leave();
   }, [room]);
 

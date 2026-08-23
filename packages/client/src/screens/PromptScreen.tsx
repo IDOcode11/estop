@@ -6,17 +6,22 @@ import { useGameState } from "../hooks/useGameState";
 interface PromptScreenProps{
     room: Room<RoomStateShape>;
 }
+const DRAFT_KEY = "estop_prompt_draft"
 
 export default function PromptScreen({ room }: PromptScreenProps){
     const state = useGameState(room);
     const [index, setIndex] = useState(0);
-    const [answers, setAnswers] = useState<string[]>([]);
+    const [answers, setAnswers] = useState<string[]>(() =>{
+        const savedAnswers = localStorage.getItem(DRAFT_KEY);
+        return savedAnswers ? JSON.parse(savedAnswers) : [];
+    });
     const [viewed, setViewed] = useState<Set<number>>(new Set([0]));
     const [remaining, setRemaining] = useState(0);
     const answersRef = useRef(answers);
 
     useEffect(() =>{
         answersRef.current = answers;
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(answers));
     }, [answers]);
 
     useEffect(() => {
@@ -47,6 +52,7 @@ export default function PromptScreen({ room }: PromptScreenProps){
     useEffect(() => {
         const unbind = room.onMessage("forceSubmit", () =>{
             room.send("submitAnswers", { answers: answersRef.current});
+            localStorage.removeItem(DRAFT_KEY);
         });
 
         return () =>{
@@ -85,6 +91,7 @@ export default function PromptScreen({ room }: PromptScreenProps){
 
     const submit = () =>{
         room.send("submitAnswers", { answers });
+        localStorage.removeItem(DRAFT_KEY);
     };
 
     return(
