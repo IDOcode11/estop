@@ -4,9 +4,10 @@ import { useGameState } from "../hooks/useGameState";
 
 interface LobbyScreenProps{
     room: Room<RoomStateShape>;
+    onLeave: () => void;
 }
 
-export default function LobbyScreen( {room}: LobbyScreenProps){
+export default function LobbyScreen( {room, onLeave}: LobbyScreenProps){
     const state = useGameState(room);
     if (!state || !state.players)
       return null;
@@ -49,8 +50,8 @@ export default function LobbyScreen( {room}: LobbyScreenProps){
                     <span className="font-semibold text-gray-800"># for Timer</span>
                     <input
                         type="number"
-                        min={15}
-                        max={150}
+                        min={10}
+                        max={60}
                         value={state.answerTimeSeconds}
                         disabled={!isLeader}
                         onChange={(e) => room.send("updateSettings", { answerTimeSeconds: Number(e.target.value) })}
@@ -60,7 +61,7 @@ export default function LobbyScreen( {room}: LobbyScreenProps){
             </div>
             <div className="flex gap-4">
                 <button
-                    onClick={() => room.leave()}
+                    onClick={onLeave}
                     className="bg-purple-400 px-6 py-3 rounded-lg font-bold text-gray-800">
                     Leave
                 </button>
