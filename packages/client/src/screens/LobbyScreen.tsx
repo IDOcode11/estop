@@ -1,6 +1,7 @@
 import { Room } from "colyseus.js";
 import { RoomStateShape } from "shared";
 import { useGameState } from "../hooks/useGameState";
+import RoomCodeBadge from "../components/RoomCodeBadge";
 
 interface LobbyScreenProps{
     room: Room<RoomStateShape>;
@@ -19,15 +20,13 @@ export default function LobbyScreen( {room, onLeave}: LobbyScreenProps){
 
     return (
         <div className="min-h-screen bg-gray-200 flex flex-col items-center gap-6 p-6">
-            <div className="w-full max-w-2xl bg-red-400 text-center py-3 rounded-lg font-bold text-gray-800">
-                Room ID: {state.roomCode}
-            </div>
-            <div className="bg-yellow-300 px-6 py-2 rounded-lg font-bold text-gray-800">
+            <RoomCodeBadge code={state.roomCode}/>
+            <div className={`bg-yellow-300 px-6 py-2 rounded-lg font-bold text-gray-800 ${isLeader ? "ring-4 ring-blue-400" : ""}`}>
                 Host: {leader?.name ?? "..."}
             </div>
             <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {guestPlayerEntries.map(([sessionId, player]) => (
-                    <div key={sessionId} className="bg-yellow-300 rounded-lg px-4 py-3 text-center font-semibold text-gray-800">
+                    <div key={sessionId} className={`bg-yellow-300 rounded-lg px-4 py-3 text-center font-semibold text-gray-800 ${sessionId === room.sessionId ? "ring-4 ring-blue-400" : ""}`} >
                         {player.name}
                     </div>
                 ))}

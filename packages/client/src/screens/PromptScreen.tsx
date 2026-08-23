@@ -2,6 +2,7 @@ import { useState, useEffect, useRef} from "react";
 import { Room } from "colyseus.js";
 import { RoomStateShape } from "shared";
 import { useGameState } from "../hooks/useGameState";
+import RoomCodeBadge from "../components/RoomCodeBadge";
 
 interface PromptScreenProps{
     room: Room<RoomStateShape>;
@@ -96,6 +97,7 @@ export default function PromptScreen({ room }: PromptScreenProps){
 
     return(
         <div className="min-h-screen bg-gray-200 flex flex-col items-center p-6 gap-6">
+            <RoomCodeBadge code={state.roomCode}/>
             <div className="w-full max-w-2xl flex items-center justify-between">
                 <div className="w-16 h-16 rounded-full bg-green-400 flex items-center justify-center font-bold text-gray-800 text-xl">
                     {state.currentLetter}

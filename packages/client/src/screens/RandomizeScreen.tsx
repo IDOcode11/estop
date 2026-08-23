@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Room } from "colyseus.js";
 import { RoomStateShape } from "shared";
 import { useGameState } from "../hooks/useGameState";
+import RoomCodeBadge from "../components/RoomCodeBadge";
 
 interface RandomizeScreenProps{
     room: Room<RoomStateShape>;
@@ -46,6 +47,7 @@ export default function RandomizeScreen( {room}: RandomizeScreenProps){
 
     return (
         <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center gap-8 p-6">
+            <RoomCodeBadge code={state.roomCode}/>
             <div className="w-40 h-40 rounded-full bg-green-400 flex items-center justify-center font-bold text-gray-800 text-4xl">
                 {displayLetter}
             </div>

@@ -1,6 +1,7 @@
 import { Room } from "colyseus.js";
 import { RoomStateShape } from "shared";
 import { useGameState } from "../hooks/useGameState";
+import RoomCodeBadge from "../components/RoomCodeBadge";
 
 interface ScoringScreenProps{
     room: Room<RoomStateShape>;
@@ -28,6 +29,7 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
 
     return(
         <div className="min-h-screen bg-gray-200 flex flex-col items-center p-6 gap-6">
+            <RoomCodeBadge code={state.roomCode}/>
             <div className="w-16 h-16 rounded-full bg-green-400 flex items-center justify-center font-bold text-gray-800 text-xl">
                 {state.currentLetter}
             </div>
@@ -43,7 +45,7 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
 
                         return (
                             <div key={sessionId} className="flex items-center gap-3">
-                                <div className="bg-green-700 text-white rounded-lg px-3 py-2 font-semibold">
+                                <div className={`bg-green-700 text-white rounded-lg px-3 py-2 font-semibold ${sessionId === room.sessionId ? "ring-4 ring-blue-400" : ""}`}>
                                     {player.name}
                                 </div>
                                 <div className="flex-1 bg-green-200 rounded-lg px-3 py-2">
