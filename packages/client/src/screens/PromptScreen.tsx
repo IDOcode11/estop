@@ -17,14 +17,17 @@ export default function PromptScreen({ room }: PromptScreenProps){
         return savedAnswers ? JSON.parse(savedAnswers) : [];
     });
     const [viewed, setViewed] = useState<Set<number>>(new Set([0]));
-    const [remaining, setRemaining] = useState(0);
+    const [remainingMs, setRemainingMs] = useState(0);
     const answersRef = useRef(answers);
+    const [validationError, setValidationError] = useState<string | null>(null);
 
+    //Player answers for the prompts
     useEffect(() =>{
         answersRef.current = answers;
         localStorage.setItem(DRAFT_KEY, JSON.stringify(answers));
     }, [answers]);
 
+    
     useEffect(() => {
         if (!state?.currentPrompts) 
           return;
@@ -35,20 +38,26 @@ export default function PromptScreen({ room }: PromptScreenProps){
 
     }, [state?.currentPrompts]);
 
+    //Stop timer
     useEffect(() => {
         if (!state?.timerEndsAt){
-            setRemaining(0);
+            setRemainingMs(0);
             return;
         }
 
         const tick = () =>{
-            setRemaining(Math.max(0, Math.ceil((state.timerEndsAt - Date.now()) / 1000)));
+            setRemainingMs(Math.max(0, state.timerEndsAt - Date.now()));
         };
         tick();
 
-        const interval = setInterval(tick, 250);
+        const interval = setInterval(tick, 30);
         return () => clearInterval(interval);
     }, [state?.timerEndsAt]);
+
+    const seconds = Math.floor(remainingMs / 1000);
+    const centiseconds = Math.floor((remainingMs % 1000) / 10);
+    const timerDisplay = `${String(seconds).padStart(2,"0")}:${String(centiseconds).padStart(2,"0")}`;
+
 
     useEffect(() => {
         const unbind = room.onMessage("forceSubmit", () =>{
@@ -68,6 +77,7 @@ export default function PromptScreen({ room }: PromptScreenProps){
     const promptCount = state.currentPrompts.length;
     const prompt = state.currentPrompts[index];
     const allViewed = viewed.size >= promptCount;
+    const hasSubmitted = state.submissions.has(room.sessionId);
 
     const movePrompt = (newIndex: number) =>{
         if (newIndex < 0){
@@ -88,9 +98,22 @@ export default function PromptScreen({ room }: PromptScreenProps){
             next[index] = value;
             return next;
         });
+
+        if (validationError)
+          setValidationError(null);
     };
 
     const submit = () =>{
+        const isFirstSubmit = state.timerEndsAt === 0;
+
+        if (isFirstSubmit){
+            const hasBlank = answers.some((a) => a.trim().length === 0);
+            if (hasBlank){
+                setValidationError("Fill in every answer before submitting first.")
+                return;
+            }
+        }
+        setValidationError(null);
         room.send("submitAnswers", { answers });
         localStorage.removeItem(DRAFT_KEY);
     };
@@ -104,17 +127,23 @@ export default function PromptScreen({ room }: PromptScreenProps){
                 </div>
 
                 {state.timerEndsAt > 0 && (
-                    <div className="bg-orange-300 rounded-lg px-6 py-3 font-bold text-gray-800">
-                        {remaining}s
+                    <div className="bg-orange-300 rounded-lg px-6 py-3 font-bold text-gray-800 font-mono">
+                        {timerDisplay}
                     </div>
                 )}
-
-                <button
-                    disabled={!allViewed}
-                    onClick={submit}
-                    className="bg-sky-400 px-6 py-3 rounded-lg font-bold text-gray-800 disabled:opacity-50">
-                    Submit
-                </button>
+                <div className="flex flex-col items-end gap-1">
+                    <button
+                        disabled={!allViewed}
+                        onClick={submit}
+                        className={`px-6 py-3 rounded-lg font-bold text-gray-800 disabled:opacity-50 ${hasSubmitted ? "bg-green-400" : "bg-sky-400"}`}>
+                        Submit
+                    </button>
+                    {validationError && (
+                        <p className="text-red-600 text-sm font-semibold max-w-45 text-right">
+                            {validationError}
+                        </p>
+                    )}
+                </div>
             </div>
             <div className="w-full max-w-2xl flex items-center gap-4">
                 <button

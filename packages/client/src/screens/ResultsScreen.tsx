@@ -24,15 +24,22 @@ export default function ResultsScreen({ room }: ResultsScreenProps){
                 Round {state.currentRound + 1}/{state.totalRounds}
             </div>
             <div className="w-full max-w-2xl flex flex-col gap-2">
+                <div className="grid grid-cols-[1fr_100px_100px] gap-2 px-1 font-bold text-gray-800 text-sm">
+                    <div>Players</div>
+                    <div className="text-center">Round Score</div>
+                    <div className="text-center">Total Score</div>
+                </div>
                 {playerEntries.map(([sessionId, player]) =>(
-                    <div key={sessionId} className="flex items-center gap-3">
-                        <div className={`flex-1 bg-green-400 rounded-lg px-4 py-2 font-semibold text-gray-800 ${sessionId === room.sessionId ? "ring-4 ring-blue-400" : ""}`}>
+                    <div 
+                        key={sessionId} 
+                        className={`grid grid-cols-[1fr_100px_100px] gap-2 items-center ${sessionId === room.sessionId ? "ring-4 ring-blue-400 rounded-lg" : ""}`}>
+                        <div className="bg-green-400 rounded-lg px-4 py-2 font-semibold text-gray-800 truncate">
                             {player.name}
                         </div>
-                        <div className="bg-yellow-200 rounded-lg px-4 py-2 font-bold text-gray-800 w-24 text-center">
+                        <div className="bg-yellow-200 rounded-lg px-4 py-2 font-bold text-gray-800 text-center">
                             {player.roundScore}
                         </div>
-                        <div className="bg-sky-400 rounded-lg px-4 py-2 font-bold text-gray-800 w-24 text-center">
+                        <div className="bg-sky-400 rounded-lg px-4 py-2 font-bold text-gray-800 text-center">
                             {player.totalScore}
                         </div>
                     </div>

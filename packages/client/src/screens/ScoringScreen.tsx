@@ -37,18 +37,25 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
                 <div className="bg-yellow-100 rounded-lg px-4 py-2 font-bold text-gray-800 self-center-safe">
                     {prompt.subject}
                 </div>
-                <div className="bg-cyan-400 rounded-lg p-3 flex flex-col gap-2">
+                <div className="bg-cyan-400 rounded-lg p-3">
+                    <div className="grid grid-cols-[1fr_1fr_80px] gap-2 px-1 pb-2 font-bold text-gray-800 text-sm">
+                        <div>Players</div>
+                        <div>Answer</div>
+                        <div className="text-center">Points</div>
+                    </div>
                     {playerEntries.map( ([sessionId, player]) =>{
                         const submission = state.submissions.get(sessionId);
                         const answer = submission?.answers[state.currentPromptIndex] ?? "";
                         const currentPoints = state.pointsInProgress.get(sessionId) ?? 0;
 
                         return (
-                            <div key={sessionId} className="flex items-center gap-3">
-                                <div className={`bg-green-700 text-white rounded-lg px-3 py-2 font-semibold ${sessionId === room.sessionId ? "ring-4 ring-blue-400" : ""}`}>
+                            <div 
+                                key={sessionId} 
+                                className={`grid grid-cols-[1fr_1fr_80px] gap-2 items-center mb-2 ${sessionId === room.sessionId ? "ring-4 ring-blue-400 rounded-lg" : ""}`}>
+                                <div className="bg-green-700 text-white rounded-lg px-3 py-2 font-semibold truncate">
                                     {player.name}
                                 </div>
-                                <div className="flex-1 bg-green-200 rounded-lg px-3 py-2">
+                                <div className="bg-green-200 rounded-lg px-3 py-2 min-h-10">
                                     {answer}
                                 </div>
                                 {isLeader ? (
@@ -63,7 +70,7 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
                                         ))}
                                     </select>
                                 ) : (
-                                    <div className="bg-gray-100 rounded-lg px-3 py-2 font-bold text-gray-800">
+                                    <div className="bg-gray-100 rounded-lg px-3 py-2 font-bold text-gray-800 text-center">
                                         {currentPoints}
                                     </div>
                                 )}
