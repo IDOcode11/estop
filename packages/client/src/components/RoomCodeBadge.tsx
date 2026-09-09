@@ -4,7 +4,7 @@ interface RoomCodeBadgeProps {
 
 export default function RoomCodeBadge({ code }: RoomCodeBadgeProps){
     return (
-        <div className="w-full max-w-2xl bg-red-400 text-center py-3 rounded-lg font-bold text-gray-800">
+        <div className="fixed top-2 left-1/2 -translate-x-1/2 bg-sunset border-2 border-ink rounded-full px-3 py-1 text-sm font-display font-bold text-ink">
           {code}
         </div>
     );

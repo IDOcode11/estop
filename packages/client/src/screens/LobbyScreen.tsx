@@ -19,21 +19,21 @@ export default function LobbyScreen( {room, onLeave}: LobbyScreenProps){
     const guestPlayerEntries = allPlayerEntries.filter(([sessionId]) => sessionId !== state.leaderId);
 
     return (
-        <div className="min-h-screen bg-gray-200 flex flex-col items-center gap-6 p-6">
+        <div className="min-h-screen flex flex-col items-center gap-6 p-6 pt-16">
             <RoomCodeBadge code={state.roomCode}/>
-            <div className={`bg-yellow-300 px-6 py-2 rounded-lg font-bold text-gray-800 ${isLeader ? "ring-4 ring-blue-400" : ""}`}>
+            <div className={`bg-white border-2 border-ink rounded-lg px-6 py-2 font-display font-bold text-ink ${isLeader ? "ring-4 ring-mint" : ""}`}>
                 Host: {leader?.name ?? "..."}
             </div>
-            <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="w-full max-w-2xl flex justify-center">
                 {guestPlayerEntries.map(([sessionId, player]) => (
-                    <div key={sessionId} className={`bg-yellow-300 rounded-lg px-4 py-3 text-center font-semibold text-gray-800 ${sessionId === room.sessionId ? "ring-4 ring-blue-400" : ""}`} >
+                    <div key={sessionId} className={`bg-white border-2 border-ink rounded-lg px-4 py-3 text-center font-semibold text-ink ${sessionId === room.sessionId ? "ring-4 ring-mint" : ""}`} >
                         {player.name}
                     </div>
                 ))}
             </div>
-            <div className="w-full max-w-2xl bg-cyan-400 rounded-lg p-4 flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="w-full max-w-2xl bg-sky/20 border-2 border-ink rounded-lg p-4 flex flex-col sm:flex-row gap-4 justify-center">
                 <label className="flex flex-col items-center gap-1">
-                    <span className="font-semibold text-gray-800"># of Rounds</span>
+                    <span className="font-display font-bold text-ink text-sm"># of Rounds</span>
                     <input
                         type="number"
                         min={1}
@@ -41,12 +41,12 @@ export default function LobbyScreen( {room, onLeave}: LobbyScreenProps){
                         value={state.totalRounds}
                         disabled={!isLeader}
                         onChange={(e) => room.send("updateSettings", { totalRounds: Number(e.target.value) })}
-                        className="w-24 bg-emerald-400 text-center rounded p-2 disabled:opacity-60"
+                        className="w-24 text-center border-2 border-ink rounded p-2 bg-white text-ink disabled:opacity-60"
                     />
                 </label>
 
                 <label className="flex flex-col items-center gap-1">
-                    <span className="font-semibold text-gray-800"># for Timer</span>
+                    <span className="font-display font-bold text-ink text-sm"># for Timer</span>
                     <input
                         type="number"
                         min={10}
@@ -54,20 +54,20 @@ export default function LobbyScreen( {room, onLeave}: LobbyScreenProps){
                         value={state.answerTimeSeconds}
                         disabled={!isLeader}
                         onChange={(e) => room.send("updateSettings", { answerTimeSeconds: Number(e.target.value) })}
-                        className="w-24 bg-emerald-400 text-center rounded p-2 disabled:opacity-60"
+                        className="w-24 text-center border-2 border-ink rounded p-2 bg-white text-ink disabled:opacity-60"
                     />
                 </label>
             </div>
             <div className="flex gap-4">
                 <button
                     onClick={onLeave}
-                    className="bg-purple-400 px-6 py-3 rounded-lg font-bold text-gray-800">
+                    className="bg-coral border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink">
                     Leave
                 </button>
                 {isLeader && (
                 <button
                     onClick={() => room.send("startGame")}
-                    className="bg-blue-400 px-6 py-3 rounded-lg font-bold text-gray-800">
+                    className="bg-sunset border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink">
                     Start Game
                 </button>)}
             </div>

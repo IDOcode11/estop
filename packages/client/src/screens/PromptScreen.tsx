@@ -2,7 +2,6 @@ import { useState, useEffect, useRef} from "react";
 import { Room } from "colyseus.js";
 import { RoomStateShape } from "shared";
 import { useGameState } from "../hooks/useGameState";
-import RoomCodeBadge from "../components/RoomCodeBadge";
 
 interface PromptScreenProps{
     room: Room<RoomStateShape>;
@@ -119,15 +118,14 @@ export default function PromptScreen({ room }: PromptScreenProps){
     };
 
     return(
-        <div className="min-h-screen bg-gray-200 flex flex-col items-center p-6 gap-6">
-            <RoomCodeBadge code={state.roomCode}/>
+        <div className="min-h-screen flex flex-col items-center p-6 gap-6">
             <div className="w-full max-w-2xl flex items-center justify-between">
-                <div className="w-16 h-16 rounded-full bg-green-400 flex items-center justify-center font-bold text-gray-800 text-xl">
+                <div className="w-16 h-16 rounded-full bg-sunset border-2 border-ink flex items-center justify-center font-display font-bold text-ink text-xl leading-none">
                     {state.currentLetter}
                 </div>
 
                 {state.timerEndsAt > 0 && (
-                    <div className="bg-orange-300 rounded-lg px-6 py-3 font-bold text-gray-800 font-mono">
+                    <div className="bg-coral border-2 border-ink rounded-lg px-6 py-3 font-display font-bold text-ink">
                         {timerDisplay}
                     </div>
                 )}
@@ -135,11 +133,11 @@ export default function PromptScreen({ room }: PromptScreenProps){
                     <button
                         disabled={!allViewed}
                         onClick={submit}
-                        className={`px-6 py-3 rounded-lg font-bold text-gray-800 disabled:opacity-50 ${hasSubmitted ? "bg-green-400" : "bg-sky-400"}`}>
-                        Submit
+                        className={`border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink disabled:opacity-50 ${hasSubmitted ? "bg-mint" : "bg-sky"}`}>
+                        STOP
                     </button>
                     {validationError && (
-                        <p className="text-red-600 text-sm font-semibold max-w-45 text-right">
+                        <p className="text-coral text-sm font-semibold max-w-45 text-right">
                             {validationError}
                         </p>
                     )}
@@ -149,24 +147,24 @@ export default function PromptScreen({ room }: PromptScreenProps){
                 <button
                     onClick={() => movePrompt(index - 1)}
                     disabled={index === 0}
-                    className="text-3xl font-bold text-gray-700 disabled:opacity-30">
+                    className="text-3xl font-bold text-ink disabled:opacity-30">
                     ‹
                 </button>
-                <div className="flex-1 bg-yellow-100 rounded-lg p-6 flex flex-col gap-4">
-                    <div className="bg-purple-300 rounded-lg px-4 py-2 font-bold text-gray-800 self-center-safe">
+                <div className="flex-1 bg-white border-2 border-ink rounded-lg p-6 flex flex-col gap-4">
+                    <div className="bg-sky/30 border-2 border-ink rounded-lg px-4 py-2 font-display font-bold text-ink self-center">
                         {prompt.subject}
                     </div>
                     <input
                         value={answers[index] ?? ""}
                         onChange={(e) => updateAnswer(e.target.value)}
-                        className="bg-gray-100 rounded-lg px-4 py-3"
+                        className="bg-white border-2 border-ink rounded-lg px-4 py-3 text-ink"
                         placeholder={`Starts with "${state.currentLetter}"`}
                     />
                 </div>
                 <button
                     onClick={() => movePrompt(index + 1)}
                     disabled={index === promptCount - 1}
-                    className="text-3xl font-bold text-gray-700 disabled:opacity-30">
+                    className="text-3xl font-bold text-ink disabled:opacity-30">
                     ›
                 </button>
             </div>

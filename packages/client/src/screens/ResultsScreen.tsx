@@ -18,13 +18,13 @@ export default function ResultsScreen({ room }: ResultsScreenProps){
     const isFinalRound = state.currentRound >= state.totalRounds - 1;
 
     return (
-        <div className="min-h-screen bg-gray-200 flex flex-col items-center p-6 gap-6">
+        <div className="min-h-screen flex flex-col items-center p-6 pt-16 gap-6">
             <RoomCodeBadge code={state.roomCode}/>
-            <div className="w-full max-w-2xl bg-red-400 text-center py-3 rounded-lg font-bold text-gray-800">
+            <div className="bg-sunset border-2 border-ink rounded-full px-6 py-2 font-display font-bold text-ink">
                 Round {state.currentRound + 1}/{state.totalRounds}
             </div>
             <div className="w-full max-w-2xl flex flex-col gap-2">
-                <div className="grid grid-cols-[1fr_100px_100px] gap-2 px-1 font-bold text-gray-800 text-sm">
+                <div className="grid grid-cols-[1fr_100px_100px] gap-2 px-1 font-display font-bold text-ink text-sm">
                     <div>Players</div>
                     <div className="text-center">Round Score</div>
                     <div className="text-center">Total Score</div>
@@ -32,14 +32,14 @@ export default function ResultsScreen({ room }: ResultsScreenProps){
                 {playerEntries.map(([sessionId, player]) =>(
                     <div 
                         key={sessionId} 
-                        className={`grid grid-cols-[1fr_100px_100px] gap-2 items-center ${sessionId === room.sessionId ? "ring-4 ring-blue-400 rounded-lg" : ""}`}>
-                        <div className="bg-green-400 rounded-lg px-4 py-2 font-semibold text-gray-800 truncate">
+                        className={`grid grid-cols-[1fr_100px_100px] gap-2 items-center ${sessionId === room.sessionId ? "ring-4 ring-mint rounded-lg" : ""}`}>
+                        <div className="bg-ink text-paper border-2 border-ink rounded-lg px-4 py-2 font-semibold truncate">
                             {player.name}
                         </div>
-                        <div className="bg-yellow-200 rounded-lg px-4 py-2 font-bold text-gray-800 text-center">
+                        <div className="bg-white border-2 border-ink rounded-lg px-4 py-2 font-display font-bold text-ink text-center">
                             {player.roundScore}
                         </div>
-                        <div className="bg-sky-400 rounded-lg px-4 py-2 font-bold text-gray-800 text-center">
+                        <div className="bg-sky/30 border-2 border-ink rounded-lg px-4 py-2 font-display font-bold text-ink text-center">
                             {player.totalScore}
                         </div>
                     </div>
@@ -49,13 +49,13 @@ export default function ResultsScreen({ room }: ResultsScreenProps){
                 <div className="flex gap-4">
                     <button
                         onClick={() => room.send("endGame")}
-                        className="bg-purple-400 px-6 py-3 rounded-lg font-bold text-gray-800">
+                        className="bg-coral border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink">
                         End Game
                     </button>
                     {!isFinalRound && (
                         <button
                             onClick={() => room.send("continueToNextRound")}
-                            className="bg-yellow-300 px-6 py-3 rounded-lg font-bold text-gray-800">
+                            className="bg-sky border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink">
                             Next Round
                         </button>
                     )}
