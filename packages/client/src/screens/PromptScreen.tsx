@@ -118,18 +118,23 @@ export default function PromptScreen({ room }: PromptScreenProps){
     };
 
     return(
-        <div className="min-h-screen flex flex-col items-center p-6 gap-6">
-            <div className="w-full max-w-2xl flex items-center justify-between">
-                <div className="w-16 h-16 rounded-full bg-sunset border-2 border-ink flex items-center justify-center font-display font-bold text-ink text-xl leading-none">
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-6">
+            <div className="w-full max-w-2xl grid grid-cols-3 items-center">
+                <div className="justify-self-start w-16 h-16 rounded-full bg-sunset border-2 border-ink flex items-center justify-center font-display font-bold text-ink text-xl leading-none">
                     {state.currentLetter}
                 </div>
-
-                {state.timerEndsAt > 0 && (
-                    <div className="bg-coral border-2 border-ink rounded-lg px-6 py-3 font-display font-bold text-ink">
-                        {timerDisplay}
-                    </div>
-                )}
-                <div className="flex flex-col items-end gap-1">
+                <div className="justify-self-center">
+                    {state.timerEndsAt > 0 ? (
+                        <div className="bg-coral border-2 border-ink rounded-lg px-6 py-3 font-display font-bold text-ink">
+                            {timerDisplay}
+                        </div>
+                        ) : (
+                        <div className="invisible bg-coral border-2 border-ink rounded-lg px-6 py-3 font-display font-bold">
+                            00:00
+                        </div>
+                    )}
+                </div>
+                <div className="fjustify-self-end flex flex-col items-end gap-1">
                     <button
                         disabled={!allViewed}
                         onClick={submit}
