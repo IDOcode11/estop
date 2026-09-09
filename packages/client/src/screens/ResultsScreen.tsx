@@ -32,8 +32,8 @@ export default function ResultsScreen({ room }: ResultsScreenProps){
                 {playerEntries.map(([sessionId, player]) =>(
                     <div 
                         key={sessionId} 
-                        className={`grid grid-cols-[1fr_100px_100px] gap-2 items-center ${sessionId === room.sessionId ? "ring-4 ring-mint rounded-lg" : ""}`}>
-                        <div className="bg-ink text-paper border-2 border-ink rounded-lg px-4 py-2 font-semibold truncate">
+                        className="grid grid-cols-[1fr_100px_100px] gap-2 items-center">
+                        <div className={`bg-ink ${sessionId === room.sessionId ? "text-mint" : "text-paper"} border-2 border-ink rounded-lg px-4 py-2 font-semibold truncate`}>
                             {player.name}
                         </div>
                         <div className="bg-white border-2 border-ink rounded-lg px-4 py-2 font-display font-bold text-ink text-center">

@@ -50,8 +50,8 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
                     return (
                         <div 
                             key={sessionId} 
-                            className={`grid grid-cols-[1fr_1fr_80px] gap-2 items-center mb-1 ${sessionId === room.sessionId ? "ring-4 ring-mint rounded-lg" : ""}`}>
-                            <div className="bg-ink text-paper border-2 border-ink rounded-lg px-3 py-2 font-semibold truncate">
+                            className="grid grid-cols-[1fr_1fr_80px] gap-2 items-center mb-1">
+                            <div className={`bg-ink ${sessionId === room.sessionId ? "text-mint" : "text-paper"} border-2 border-ink rounded-lg px-3 py-2 font-semibold truncate`}>
                                 {player.name}
                             </div>
                             <div className="bg-white border-2 border-ink rounded-lg px-3 py-2 min-h-10 text-ink">

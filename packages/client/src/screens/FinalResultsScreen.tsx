@@ -43,8 +43,8 @@ export default function FinalResultsScreen({ room }: FinalResultsScreenProps){
                 {rest.map(([sessionId, player]) => (
                     <div 
                         key={sessionId} 
-                        className={`flex items-center gap-3 ${sessionId === room.sessionId ? "ring-4 ring-mint rounded-lg" : ""}`}>
-                        <div className="flex-1 bg-ink text-paper border-2 border-ink rounded-lg px-4 py-2 font-semibold">
+                        className="flex items-center gap-3">
+                        <div className={`flex-1 bg-ink ${sessionId === room.sessionId ? "text-mint" : "text-paper"} border-2 border-ink rounded-lg px-4 py-2 font-semibold`}>
                             {player.name}
                         </div>
                         <div className="bg-sky/30 border-2 border-ink rounded-lg px-4 py-2 font-display font-bold text-ink w-24 text-center">

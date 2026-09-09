@@ -21,12 +21,12 @@ export default function LobbyScreen( {room, onLeave}: LobbyScreenProps){
     return (
         <div className="min-h-screen flex flex-col items-center gap-6 p-6 pt-16">
             <RoomCodeBadge code={state.roomCode}/>
-            <div className={`bg-white border-2 border-ink rounded-lg px-6 py-2 font-display font-bold text-ink ${isLeader ? "ring-4 ring-mint" : ""}`}>
+            <div className={`bg-white border-2 border-ink rounded-lg px-6 py-2 font-display font-bold ${isLeader ? "text-mint" : "text-ink"}`}>
                 Host: {leader?.name ?? "..."}
             </div>
             <div className="w-full max-w-2xl flex justify-center">
                 {guestPlayerEntries.map(([sessionId, player]) => (
-                    <div key={sessionId} className={`bg-white border-2 border-ink rounded-lg px-4 py-3 text-center font-semibold text-ink ${sessionId === room.sessionId ? "ring-4 ring-mint" : ""}`} >
+                    <div key={sessionId} className={`bg-white border-2 border-ink rounded-lg px-4 py-3 text-center font-semibold  ${sessionId === room.sessionId ? "text-mint" : "text-ink"}`} >
                         {player.name}
                     </div>
                 ))}
