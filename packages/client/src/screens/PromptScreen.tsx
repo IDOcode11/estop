@@ -20,6 +20,12 @@ export default function PromptScreen({ room }: PromptScreenProps){
     const answersRef = useRef(answers);
     const [validationError, setValidationError] = useState<string | null>(null);
 
+    //Keeps the keyboard on when on mobile
+    const inputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, [index]);
+
     //Player answers for the prompts
     useEffect(() =>{
         answersRef.current = answers;
@@ -119,59 +125,63 @@ export default function PromptScreen({ room }: PromptScreenProps){
 
     return(
         <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-6">
-            <div className="w-full max-w-2xl grid grid-cols-3 items-center">
-                <div className="justify-self-start w-16 h-16 rounded-full bg-sunset border-2 border-ink flex items-center justify-center font-display font-bold text-ink text-xl leading-none">
-                    {state.currentLetter}
-                </div>
-                <div className="justify-self-center">
-                    {state.timerEndsAt > 0 ? (
-                        <div className="bg-coral border-2 border-ink rounded-lg px-6 py-3 font-display font-bold text-ink">
-                            {timerDisplay}
-                        </div>
-                        ) : (
-                        <div className="invisible bg-coral border-2 border-ink rounded-lg px-6 py-3 font-display font-bold">
-                            00:00
-                        </div>
-                    )}
-                </div>
-                <div className="fjustify-self-end flex flex-col items-end gap-1">
-                    <button
-                        disabled={!allViewed}
-                        onClick={submit}
-                        className={`border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink disabled:opacity-50 ${hasSubmitted ? "bg-mint" : "bg-sky"}`}>
-                        STOP
-                    </button>
-                    {validationError && (
-                        <p className="text-coral text-sm font-semibold max-w-45 text-right">
-                            {validationError}
-                        </p>
-                    )}
-                </div>
-            </div>
-            <div className="w-full max-w-2xl flex items-center gap-4">
-                <button
-                    onClick={() => movePrompt(index - 1)}
-                    disabled={index === 0}
-                    className="text-3xl font-bold text-ink disabled:opacity-30">
-                    ‹
-                </button>
-                <div className="flex-1 bg-white border-2 border-ink rounded-lg p-6 flex flex-col gap-4">
-                    <div className="bg-sky/30 border-2 border-ink rounded-lg px-4 py-2 font-display font-bold text-ink self-center">
-                        {prompt.subject}
+            <div className="flex flex-col items-center gap-6 mb-16">
+                <div className="w-full max-w-2xl grid grid-cols-3 items-center">
+                    <div className="justify-self-start w-16 h-16 rounded-full bg-sunset border-2 border-ink flex items-center justify-center font-display font-bold text-ink text-xl leading-none">
+                        {state.currentLetter}
                     </div>
-                    <input
-                        value={answers[index] ?? ""}
-                        onChange={(e) => updateAnswer(e.target.value)}
-                        className="bg-white border-2 border-ink rounded-lg px-4 py-3 text-ink"
-                        placeholder={`Starts with "${state.currentLetter}"`}
-                    />
+                    <div className="justify-self-center">
+                        {state.timerEndsAt > 0 ? (
+                            <div className="bg-coral border-2 border-ink rounded-lg px-6 py-3 font-display font-bold text-ink">
+                                {timerDisplay}
+                            </div>
+                            ) : (
+                            <div className="invisible bg-coral border-2 border-ink rounded-lg px-6 py-3 font-display font-bold">
+                                00:00
+                            </div>
+                        )}
+                    </div>
+                    <div className="fjustify-self-end flex flex-col items-end gap-1">
+                        <button
+                            disabled={!allViewed}
+                            onClick={submit}
+                            className={`border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink disabled:opacity-50 ${hasSubmitted ? "bg-mint" : "bg-sky"}`}>
+                            STOP
+                        </button>
+                        {validationError && (
+                            <p className="text-coral text-sm font-semibold max-w-45 text-right">
+                                {validationError}
+                            </p>
+                        )}
+                    </div>
                 </div>
-                <button
-                    onClick={() => movePrompt(index + 1)}
-                    disabled={index === promptCount - 1}
-                    className="text-3xl font-bold text-ink disabled:opacity-30">
-                    ›
-                </button>
+                <div className="w-full max-w-2xl flex items-center gap-4">
+                    <button
+                        onClick={() => movePrompt(index - 1)}
+                        disabled={index === 0}
+                        className="text-3xl font-bold text-ink disabled:opacity-30">
+                        ‹
+                    </button>
+                    <div className="flex-1 bg-white border-2 border-ink rounded-lg p-6 flex flex-col gap-4 animate-[prompt-in_200ms_ease_out]">
+                        <div className="bg-sky/30 border-2 border-ink rounded-lg px-4 py-2 font-display font-bold text-ink self-center">
+                            {prompt.subject}
+                        </div>
+                        <input
+                            ref={inputRef}
+                            maxLength={40}
+                            value={answers[index] ?? ""}
+                            onChange={(e) => updateAnswer(e.target.value)}
+                            className="bg-white border-2 border-ink rounded-lg px-4 py-3 text-ink"
+                            placeholder={`Starts with "${state.currentLetter}"`}
+                        />
+                    </div>
+                    <button
+                        onClick={() => movePrompt(index + 1)}
+                        disabled={index === promptCount - 1}
+                        className="text-3xl font-bold text-ink disabled:opacity-30">
+                        ›
+                    </button>
+                </div>
             </div>
         </div>
     );

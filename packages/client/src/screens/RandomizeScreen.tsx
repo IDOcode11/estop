@@ -58,36 +58,38 @@ export default function RandomizeScreen( {room}: RandomizeScreenProps){
     return (
         <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-6 pt-16">
             <RoomCodeBadge code={state.roomCode}/>
-            <div
-                className="rounded-full border-4 border-ink overflow-hidden"
-                style={{ width: CELL_SIZE, height: CELL_SIZE }}>
+            <div className="flex flex-col items-center gap-8 mb-16">
                 <div
-                    className="flex"
-                    style={{
-                        transform: `translateX(${offset}px)`,
-                        transition: animatingRef.current ? `transform ${SPIN_DURATION_MS}ms cubic-bezier(0.15, 0.85, 0.25, 1)`: "none",
-                    }}
-                    onTransitionEnd={() => {
-                        animatingRef.current = false;
-                        setLanded(true);
-                    }}>
-                    {reel.map((letter, i) => (
-                        <div
-                            key={i}
-                            className="flex items-center justify-center bg-sunset font-display font-bold text-ink text-5xl leading-none shrink-0"
-                            style={{ width: CELL_SIZE, height: CELL_SIZE }}>
-                            {letter}
-                        </div>
-                    ))}
+                    className="rounded-full border-4 border-ink overflow-hidden"
+                    style={{ width: CELL_SIZE, height: CELL_SIZE }}>
+                    <div
+                        className="flex"
+                        style={{
+                            transform: `translateX(${offset}px)`,
+                            transition: animatingRef.current ? `transform ${SPIN_DURATION_MS}ms cubic-bezier(0.15, 0.85, 0.25, 1)`: "none",
+                        }}
+                        onTransitionEnd={() => {
+                            animatingRef.current = false;
+                            setLanded(true);
+                        }}>
+                        {reel.map((letter, i) => (
+                            <div
+                                key={i}
+                                className="flex items-center justify-center bg-sunset font-display font-bold text-ink text-5xl leading-none shrink-0"
+                                style={{ width: CELL_SIZE, height: CELL_SIZE }}>
+                                {letter}
+                            </div>
+                        ))}
+                    </div>
                 </div>
+                {isLeader && landed && (
+                    <button
+                        onClick={() => room.send("revealPrompts")}
+                        className="bg-sky border-2 border-ink px-8 py-3 rounded-lg font-display font-bold text-ink">
+                        Begin
+                    </button>
+                )}
             </div>
-            {isLeader && landed && (
-                <button
-                    onClick={() => room.send("revealPrompts")}
-                    className="bg-sky border-2 border-ink px-8 py-3 rounded-lg font-display font-bold text-ink">
-                    Begin
-                </button>
-            )}
         </div>
     );
 }
