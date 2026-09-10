@@ -2,8 +2,9 @@ import { useCallback, useEffect ,useRef, useState } from "react";
 import { Client, Room } from "colyseus.js";
 import { RoomStateShape } from "../../../shared/src";
 
-const SERVER_URL = "ws://localhost:2567"; //Used as WebSocket for Colyseus
-const HTTP_URL = "http://localhost:2567"; //Used as RESTful call
+const SERVER_HOST = window.location.hostname
+const SERVER_URL = `ws://${SERVER_HOST}:2567`; //Used as WebSocket for Colyseus
+const HTTP_URL = `hhtp://${SERVER_HOST}:2567`; //Used as RESTful call
 const RECONNECT_KEY = "estop_reconnection_token";
 
 export function useRoomConnection() {
