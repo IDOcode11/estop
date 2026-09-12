@@ -35,7 +35,7 @@ export default function LobbyScreen( {room, onLeave}: LobbyScreenProps){
     const guestPlayerEntries = allPlayerEntries.filter(([sessionId]) => sessionId !== state.leaderId);
 
     return (
-        <div className="min-h-screen flex flex-col items-center gap-6 p-6 pt-16">
+        <div className="min-h-screen flex flex-col items-center gap-6 p-6">
             <RoomCodeBadge code={state.roomCode}/>
             <div className={`bg-white border-2 border-ink rounded-lg px-6 py-2 font-display font-bold ${isLeader ? "text-mint" : "text-ink"}`}>
                 Host: {leader?.name ?? "..."}

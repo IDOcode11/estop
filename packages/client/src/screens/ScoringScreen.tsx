@@ -28,7 +28,7 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
     };
 
     return(
-        <div className="min-h-screen flex flex-col items-center p-6 pt-16 gap-6">
+        <div className="min-h-screen flex flex-col items-center gap-6 p-6 ">
             <RoomCodeBadge code={state.roomCode}/>
             <div className="w-16 h-16 rounded-full bg-sunset border-2 border-ink flex items-center justify-center font-display font-bold text-ink text-xl leading-none">
                 {state.currentLetter}
@@ -54,7 +54,7 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
                             <div className={`bg-ink ${sessionId === room.sessionId ? "text-mint" : "text-paper"} border-2 border-ink rounded-lg px-3 py-2 font-semibold truncate`}>
                                 {player.name}
                             </div>
-                            <div className="bg-white border-2 border-ink rounded-lg px-3 py-2 min-h-10 text-ink wrap-break-word">
+                            <div className="bg-white border-2 border-ink rounded-lg px-3 py-2 min-h-10 text-ink wrap-break-word min-w-0">
                                 {answer}
                             </div>
                             {isLeader ? (

@@ -56,7 +56,7 @@ export default function RandomizeScreen( {room}: RandomizeScreenProps){
     const isLeader = room.sessionId === state.leaderId;
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-6 pt-16">
+        <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-6">
             <RoomCodeBadge code={state.roomCode}/>
             <div className="flex flex-col items-center gap-8 mb-16">
                 <div

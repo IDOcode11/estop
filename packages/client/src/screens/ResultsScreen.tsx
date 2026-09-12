@@ -18,7 +18,7 @@ export default function ResultsScreen({ room }: ResultsScreenProps){
     const isFinalRound = state.currentRound >= state.totalRounds - 1;
 
     return (
-        <div className="min-h-screen flex flex-col items-center p-6 pt-16 gap-6">
+        <div className="min-h-screen flex flex-col items-center gap-6 p-6">
             <RoomCodeBadge code={state.roomCode}/>
             <div className="bg-sunset border-2 border-ink rounded-full px-6 py-2 font-display font-bold text-ink">
                 Round {state.currentRound + 1}/{state.totalRounds}
