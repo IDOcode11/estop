@@ -1,7 +1,7 @@
 import { Room, Client, Delayed } from "colyseus";
 import { RoomState, Player, PromptSchema, SubmissionSchema } from "./schema/RoomState";
 import { PROMPT_BANK } from "../data/promptBank";
-import { registerRoomCode } from "../data/roomCodes";
+import { registerRoomCode, releaseRoomCode } from "../data/roomCodes";
 
 export class GameRoom extends Room<RoomState> {
   maxClients = 16;
@@ -169,6 +169,9 @@ export class GameRoom extends Room<RoomState> {
   }
 
   onJoin(client: Client, options: any) {
+    if (this.state.phase !== "lobby")
+      throw new Error("Game already in progress");
+    
     // Add a Player to state.players
     const player = new Player();
     player.name = options.name ?? `Player ${this.state.players.size + 1}`;
@@ -201,6 +204,10 @@ export class GameRoom extends Room<RoomState> {
     } catch {
         this.removePlayer(client.sessionId);
     }
+  }
+
+  onDispose() {
+    releaseRoomCode(this.state.roomCode);
   }
 
   /**

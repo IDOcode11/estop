@@ -10,9 +10,17 @@ import ResultsScreen from "./screens/ResultsScreen";
 import FinalResultsScreen from "./screens/FinalResultsScreen";
 
 export default function App() {
-    const { room, connecting, error, createRoom, joinRoom } = useRoomConnection();
+    const { room, connecting,reconnecting, error, createRoom, joinRoom, leaveRoom } = useRoomConnection();
     const [name, setName] = useState("");
     const state = useGameState(room);
+
+    if (reconnecting){
+        return (
+            <div className="min-h-screen bg-gray-200 flex items-center justify-center">
+                <p className="font-bold text-gray-700">Reconnecting...</p>
+            </div>
+        );
+    }
 
     if (!room) {
         return (
@@ -36,7 +44,7 @@ export default function App() {
 
     switch (state.phase){
         case "lobby":
-            return <LobbyScreen room={room}/>;
+            return <LobbyScreen room={room} onLeave={leaveRoom}/>;
         case "randomize":
             return <RandomizeScreen room={room}/>;
         case "prompt":
@@ -48,6 +56,6 @@ export default function App() {
         case "finalResults":
             return <FinalResultsScreen room={room}/>;
         default:
-            return <LobbyScreen room={room}/>;
+            return <LobbyScreen room={room} onLeave={leaveRoom}/>;
     } 
 }

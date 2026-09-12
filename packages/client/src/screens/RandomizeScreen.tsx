@@ -1,42 +1,53 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Room } from "colyseus.js";
 import { RoomStateShape } from "shared";
 import { useGameState } from "../hooks/useGameState";
+import RoomCodeBadge from "../components/RoomCodeBadge";
 
 interface RandomizeScreenProps{
     room: Room<RoomStateShape>;
 }
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-const SPIN_DURATION_MS = 2000;
-const SPIN_INTERVAL_MS = 80;
+const CELL_SIZE = 160;
+const REEL_LENGTH = 24;
+const SPIN_DURATION_MS = 2200;
+
+function buildReel(targetLetter: string): string[]{
+    const reel: string[] = [];
+    for (let i = 0; i < REEL_LENGTH - 1; i++){
+        reel.push(ALPHABET[Math.floor(Math.random() * ALPHABET.length)]);
+    }
+
+    reel.push(targetLetter);
+    return reel;
+}
 
 export default function RandomizeScreen( {room}: RandomizeScreenProps){
     const state = useGameState(room);
-    const [displayLetter, setDisplayLetter] = useState("_");
+    const [reel, setReel] = useState<string[]>([]);
+    const [offset, setOffset] = useState(0);
     const [landed, setLanded] = useState(false);
+    const animatingRef = useRef(false);
+
 
     useEffect(() => {
         if (!state?.currentLetter)
           return;
 
+        const newReel = buildReel(state.currentLetter);
+        setReel(newReel);
+        setOffset(0);
         setLanded(false);
-        const startTime = Date.now();
+        animatingRef.current = true;
 
-        const interval = setInterval(() => {
-            const elapsed = Date.now() - startTime;
-            
-            if (elapsed >= SPIN_DURATION_MS){
-                setDisplayLetter(state.currentLetter);
-                setLanded(true);
-                clearInterval(interval);
-                return;
-            }
-            
-            setDisplayLetter(ALPHABET[Math.floor(Math.random() * ALPHABET.length)]);
-        }, SPIN_INTERVAL_MS);
+        const raf = requestAnimationFrame(() =>{
+            requestAnimationFrame(() =>{
+                setOffset(-(newReel.length - 1) * CELL_SIZE);
+            });    
+        });
 
-        return () => clearInterval(interval);
+        return () => cancelAnimationFrame(raf);
     }, [state?.currentLetter]);
 
     if (!state)
@@ -45,17 +56,40 @@ export default function RandomizeScreen( {room}: RandomizeScreenProps){
     const isLeader = room.sessionId === state.leaderId;
 
     return (
-        <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center gap-8 p-6">
-            <div className="w-40 h-40 rounded-full bg-green-400 flex items-center justify-center font-bold text-gray-800 text-4xl">
-                {displayLetter}
+        <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-6">
+            <RoomCodeBadge code={state.roomCode}/>
+            <div className="flex flex-col items-center gap-8 mb-16">
+                <div
+                    className="rounded-full border-4 border-ink overflow-hidden"
+                    style={{ width: CELL_SIZE, height: CELL_SIZE, boxSizing: "content-box"}}>
+                    <div
+                        className="flex"
+                        style={{
+                            transform: `translateX(${offset}px)`,
+                            transition: animatingRef.current ? `transform ${SPIN_DURATION_MS}ms cubic-bezier(0.15, 0.85, 0.25, 1)`: "none",
+                        }}
+                        onTransitionEnd={() => {
+                            animatingRef.current = false;
+                            setLanded(true);
+                        }}>
+                        {reel.map((letter, i) => (
+                            <div
+                                key={i}
+                                className="flex items-center justify-center bg-sunset font-display font-bold text-ink text-5xl leading-none shrink-0"
+                                style={{ width: CELL_SIZE, height: CELL_SIZE }}>
+                                {letter}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                {isLeader && landed && (
+                    <button
+                        onClick={() => room.send("revealPrompts")}
+                        className="bg-sky border-2 border-ink px-8 py-3 rounded-lg font-display font-bold text-ink">
+                        Begin
+                    </button>
+                )}
             </div>
-            {isLeader && landed && (
-                <button
-                    onClick={() => room.send("revealPrompts")}
-                    className="bg-sky-400 px-8 py-3 rounded-lg font-bold text-gray-800">
-                    Begin
-                </button>
-            )}
         </div>
     );
 }
