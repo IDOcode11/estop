@@ -61,7 +61,7 @@ export default function RandomizeScreen( {room}: RandomizeScreenProps){
             <div className="flex flex-col items-center gap-8 mb-16">
                 <div
                     className="rounded-full border-4 border-ink overflow-hidden"
-                    style={{ width: CELL_SIZE, height: CELL_SIZE }}>
+                    style={{ width: CELL_SIZE, height: CELL_SIZE, boxSizing: "content-box"}}>
                     <div
                         className="flex"
                         style={{

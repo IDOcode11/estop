@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef} from "react";
 import { Room } from "colyseus.js";
 import { RoomStateShape } from "shared";
 import { useGameState } from "../hooks/useGameState";
@@ -17,11 +17,19 @@ export default function PromptScreen({ room }: PromptScreenProps){
     });
     const [viewed, setViewed] = useState<Set<number>>(new Set([0]));
     const [remainingMs, setRemainingMs] = useState(0);
-    const answersRef = useRef(answers);
     const [validationError, setValidationError] = useState<string | null>(null);
+    
+    const answersRef = useRef(answers);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const touchStartX = useRef<number | null>(null);
+
+    const seconds = Math.floor(remainingMs / 1000);
+    const centiseconds = Math.floor((remainingMs % 1000) / 10);
+    const timerDisplay = `${String(seconds).padStart(2,"0")}:${String(centiseconds).padStart(2,"0")}`;
+    const SWIPE_THRESHOLD = 50;
+
 
     //Keeps the keyboard on when on mobile
-    const inputRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
         inputRef.current?.focus();
     }, [index]);
@@ -58,11 +66,6 @@ export default function PromptScreen({ room }: PromptScreenProps){
         const interval = setInterval(tick, 30);
         return () => clearInterval(interval);
     }, [state?.timerEndsAt]);
-
-    const seconds = Math.floor(remainingMs / 1000);
-    const centiseconds = Math.floor((remainingMs % 1000) / 10);
-    const timerDisplay = `${String(seconds).padStart(2,"0")}:${String(centiseconds).padStart(2,"0")}`;
-
 
     useEffect(() => {
         const unbind = room.onMessage("forceSubmit", () =>{
@@ -123,8 +126,31 @@ export default function PromptScreen({ room }: PromptScreenProps){
         localStorage.removeItem(DRAFT_KEY);
     };
 
+    const handleTouchStart = (e: React.TouchEvent) =>{
+        touchStartX.current = e.touches[0].clientX;
+    }
+
+    const handleTouchEnd = (e: React.TouchEvent) =>{
+        if (touchStartX.current == null)
+          return;
+
+        const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+
+        if (Math.abs(deltaX) > SWIPE_THRESHOLD){
+            if (deltaX < 0){
+                movePrompt(index + 1);
+            } else {
+                movePrompt(index - 1);
+            }
+        }
+
+        touchStartX.current = null;
+    }
+
     return(
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-6">
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-6"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}>
             <div className="flex flex-col items-center gap-6 mb-16">
                 <div className="w-full max-w-2xl grid grid-cols-3 items-center">
                     <div className="justify-self-start w-16 h-16 rounded-full bg-sunset border-2 border-ink flex items-center justify-center font-display font-bold text-ink text-xl leading-none">
@@ -162,7 +188,9 @@ export default function PromptScreen({ room }: PromptScreenProps){
                         className="text-3xl font-bold text-ink disabled:opacity-30">
                         ‹
                     </button>
-                    <div className="flex-1 bg-white border-2 border-ink rounded-lg p-6 flex flex-col gap-4 animate-[prompt-in_200ms_ease_out]">
+                    <div 
+                        className="flex-1 bg-white border-2 border-ink rounded-lg p-6 flex flex-col gap-4 animate-[prompt-in_200ms_ease_out]"
+                        >
                         <div className="bg-sky/30 border-2 border-ink rounded-lg px-4 py-2 font-display font-bold text-ink self-center">
                             {prompt.subject}
                         </div>
