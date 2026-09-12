@@ -2,9 +2,11 @@ import { useCallback, useEffect ,useRef, useState } from "react";
 import { Client, Room } from "colyseus.js";
 import { RoomStateShape } from "../../../shared/src";
 
-const SERVER_HOST = window.location.hostname
-const SERVER_URL = `ws://${SERVER_HOST}:2567`; //Used as WebSocket for Colyseus
-const HTTP_URL = `http://${SERVER_HOST}:2567`; //Used as RESTful call
+const PROD_WS_URL = import.meta.env.VITE_SERVER_URL;
+const PROD_HTTP_URL = import.meta.env.VITE_HTTP_URL;
+
+const SERVER_URL = PROD_WS_URL || `ws://${window.location.hostname}:2567`; //Used as WebSocket for Colyseus
+const HTTP_URL = PROD_HTTP_URL || `http://${window.location.hostname}:2567`; //Used as RESTful call
 const RECONNECT_KEY = "estop_reconnection_token";
 
 export function useRoomConnection() {

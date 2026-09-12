@@ -4,10 +4,10 @@ export interface BankPrompt {
 }
 
 export const PROMPT_BANK: BankPrompt[] = [
-      {id: "p1", subject: "Movie"},
-      {id: "p2", subject: "Food"},
-      {id: "p3", subject: "Place"},
-      {id: "p4", subject: "Thing"},
-      {id: "p5", subject: "Name"}
-      //Need the rest of the list later
+      {id: "p1", subject: "First Name"},
+      {id: "p2", subject: "Last Name"},
+      {id: "p3", subject: "Thing"},
+      {id: "p4", subject: "Animal"},
+      {id: "p5", subject: "Fruit/Vegetable"},
+      {id: "p6", subject: "Country/Municipal"}
 ]
