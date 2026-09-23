@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Room } from "colyseus.js";
 import { RoomStateShape } from "shared";
 import { useGameState } from "../hooks/useGameState";
@@ -6,8 +7,22 @@ interface FinalResultsScreenProps{
     room: Room<RoomStateShape>;
 }
 
+const CONFETTI_COLORS = ["#FF8A3D", "#FF5A5F", "#22C48D", "#3B9AFF"];
+
+function useConfetti(count: number) {
+    return useMemo( () => Array.from({length: count}, (_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 0.6,
+        duration: 2.5 + Math.random() * 1.5,
+        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+        rotate: Math.random() * 360,
+    })), [] );
+}
+
 export default function FinalResultsScreen({ room }: FinalResultsScreenProps){
     const state = useGameState(room);
+    const confetti = useConfetti(60);
 
     if (!state || !state.players) 
       return null;
@@ -22,6 +37,20 @@ export default function FinalResultsScreen({ room }: FinalResultsScreenProps){
 
     return (
         <div className="min-h-screen flex flex-col items-center p-6 gap-6">
+            <div className="fixed inset-0 pointer-events-none overflow-hidden">
+                {confetti.map((c) => (
+                    <div
+                        key={c.id}
+                        className="absolute top-5 w-2 h-4"
+                        style={{
+                            left: `${c.left}%`,
+                            backgroundColor: c.color,
+                            animation: `confetti-fall ${c.duration}s ${c.delay}s ease-in forwards`,
+                            transform: `rotate(${c.rotate}deg)`,
+                        }}
+                    />
+                ))}
+            </div>
             <div className="w-full max-w-md bg-sunset border-4 border-ink rounded-lg p-4 flex flex-col items-center gap-3">
                 <div className="font-display font-bold text-ink text-sm uppercase tracking-wide">
                     {isTie ? "Winners" : "Winner"}

@@ -50,7 +50,7 @@ export default function ResultsScreen({ room }: ResultsScreenProps){
                     <button
                         onClick={() => room.send("endGame")}
                         className="bg-coral border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink">
-                        End Game
+                        Show Winner
                     </button>
                     {!isFinalRound && (
                         <button

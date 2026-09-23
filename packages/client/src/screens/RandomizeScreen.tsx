@@ -83,11 +83,18 @@ export default function RandomizeScreen( {room}: RandomizeScreenProps){
                     </div>
                 </div>
                 {isLeader && landed && (
-                    <button
-                        onClick={() => room.send("revealPrompts")}
-                        className="bg-sky border-2 border-ink px-8 py-3 rounded-lg font-display font-bold text-ink">
-                        Begin
-                    </button>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => room.send("skipLetter")}
+                            className="bg-white border-2 border-ink px-8 py-3 rounded-lg font-display font-bold text-ink">
+                            Skip Letter
+                        </button>
+                        <button
+                            onClick={() => room.send("revealPrompts")}
+                            className="bg-sky border-2 border-ink px-8 py-3 rounded-lg font-display font-bold text-ink">
+                            Begin
+                        </button>
+                    </div>
                 )}
             </div>
         </div>

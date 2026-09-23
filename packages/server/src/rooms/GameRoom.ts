@@ -6,6 +6,7 @@ import { registerRoomCode, releaseRoomCode } from "../data/roomCodes";
 export class GameRoom extends Room<RoomState> {
   maxClients = 16;
   private roomTimer: Delayed | null = null;
+  private promptPointsHistory: Map<string, number>[] = [];
 
   onCreate(options: any) {
     this.state = new RoomState();
@@ -41,6 +42,17 @@ export class GameRoom extends Room<RoomState> {
       });
 
       this.state.currentRound = 0;
+      this.startRandomizePhase();
+    });
+
+    //This is a leader buttin interaction to skip letter of the round
+    this.onMessage("skipLetter", (client) =>{
+      if (this.state.phase !== "randomize")
+        return;
+
+      if (client.sessionId !== this.state.leaderId)
+        return;
+
       this.startRandomizePhase();
     });
 
@@ -87,6 +99,42 @@ export class GameRoom extends Room<RoomState> {
     });
 
     /**
+     * This moves the scoring to the previous prompt and 
+     * reduces the points in progress in case of score adjustments
+     */
+    this.onMessage("previousScoring", (client) => {
+      if (this.state.phase !== "scoring") 
+        return;
+
+      if (client.sessionId !== this.state.leaderId) 
+        return;
+
+      if (this.state.currentPromptIndex <= 0)
+        return;
+
+      const targetIndex = this.state.currentPromptIndex - 1;
+      const previousSnapshot = this.promptPointsHistory[targetIndex];
+
+      if (previousSnapshot){
+        previousSnapshot.forEach((points, playerId) => {
+          const player = this.state.players.get(playerId);
+          if (player)
+            player.roundScore -= points;
+        });
+      }
+
+      this.state.currentPromptIndex = targetIndex;
+
+      this.state.pointsInProgress.clear();
+
+      if (previousSnapshot){
+        previousSnapshot.forEach((points, playerId) =>{
+          this.state.pointsInProgress.set(playerId, points);
+        });
+      }
+    });
+
+    /**
      * This add up the points:
      *  - pointsInProgress -> roundScore, per prompt
      *  - roundScore -> totalScore, per round
@@ -97,6 +145,8 @@ export class GameRoom extends Room<RoomState> {
 
       if (client.sessionId !== this.state.leaderId) 
         return;
+      
+      this.promptPointsHistory[this.state.currentPromptIndex] = new Map(this.state.pointsInProgress);
 
       this.state.pointsInProgress.forEach((points, playerId) => {
         const player = this.state.players.get(playerId);
@@ -192,13 +242,13 @@ export class GameRoom extends Room<RoomState> {
         player.connected = false;
 
     if (consented){
-        this.state.players.delete(client.sessionId);
+        this.removePlayer(client.sessionId);
         return;
     }
 
     // Handle reconnection window
     try{
-        await this.allowReconnection(client, 90) //Wait 1:30 min
+        await this.allowReconnection(client, 15) //Wait 15s 
         if(player)
             player.connected = true;
     } catch {
@@ -313,6 +363,7 @@ export class GameRoom extends Room<RoomState> {
   private startScoringPhase() {
     this.state.currentPromptIndex = 0;
     this.state.pointsInProgress.clear();
+    this.promptPointsHistory = [];
     this.state.phase = "scoring";
   }
 

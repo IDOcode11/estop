@@ -23,6 +23,10 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
         room.send("awardPoints", { toPlayerId, points });
     };
 
+    const backPromptToScore = () =>{
+        room.send("previousScoring");
+    }; 
+
     const nextPromptToScore = () =>{
         room.send("continueScoring");
     };
@@ -78,11 +82,20 @@ export default function ScoringScreen({ room }: ScoringScreenProps) {
                 })}
             </div>
             {isLeader && (
-                <button
-                    onClick={nextPromptToScore}
-                    className="bg-sunset border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink">
-                    Next
-                </button>
+                <div className="flex gap-4">
+                    {state.currentPromptIndex > 0 && (
+                        <button
+                            onClick={backPromptToScore}
+                            className="bg-white border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink">
+                            Back
+                        </button>    
+                    )}
+                    <button
+                        onClick={nextPromptToScore}
+                        className="bg-sunset border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink">
+                        Next
+                    </button>
+                </div>
             )}
         </div>
     );

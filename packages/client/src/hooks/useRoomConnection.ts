@@ -15,13 +15,35 @@ export function useRoomConnection() {
   const [connecting, setConnecting] = useState(false);
   const [reconnecting, setReconnecting] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isConsentedLeaveRef = useRef(false);
 
   const attachRoom = useCallback((joinedRoom: Room<RoomStateShape>) =>{
     localStorage.setItem(RECONNECT_KEY, joinedRoom.reconnectionToken);
+    isConsentedLeaveRef.current = false;
     
-    joinedRoom.onLeave(() =>{
-      localStorage.removeItem(RECONNECT_KEY);
-      setRoom(null);
+    joinedRoom.onLeave((code) =>{
+      if (isConsentedLeaveRef.current || code === 1000){
+        localStorage.removeItem(RECONNECT_KEY);
+        setRoom(null);
+        return;
+      }
+
+      setReconnecting(true);
+      const token = localStorage.getItem(RECONNECT_KEY);
+      if (!token){
+        setRoom(null);
+        setReconnecting(false);
+        return;
+      }
+
+      clientRef.current
+        .reconnect<RoomStateShape>(token)
+        .then((reconnectedRoom) => attachRoom(reconnectedRoom))
+        .catch(() =>{
+          localStorage.removeItem(RECONNECT_KEY);
+          setRoom(null);
+        })
+        .finally(() => setReconnecting(false));
     });
     
     setRoom(joinedRoom);
@@ -86,6 +108,7 @@ export function useRoomConnection() {
   }, [attachRoom]);
 
   const leaveRoom = useCallback(() => {
+    isConsentedLeaveRef.current = true;
     localStorage.removeItem(RECONNECT_KEY);
     localStorage.removeItem("estop_prompt_draft");
     room?.leave();

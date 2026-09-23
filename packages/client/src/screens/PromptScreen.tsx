@@ -45,11 +45,13 @@ export default function PromptScreen({ room }: PromptScreenProps){
         if (!state?.currentPrompts) 
           return;
         
-        if (answers.length !== state.currentPrompts.length){
-          setAnswers(new Array(state.currentPrompts.length).fill(""));
-        }
+        setAnswers(new Array(state.currentPrompts.length).fill(""));
+        setViewed(new Set([0]));
+        setIndex(0);
+        setValidationError(null);
+        localStorage.removeItem(DRAFT_KEY);
 
-    }, [state?.currentPrompts]);
+    }, [state?.currentRound, state?.currentPrompts?.length]);
 
     //Stop timer
     useEffect(() => {
@@ -167,7 +169,10 @@ export default function PromptScreen({ room }: PromptScreenProps){
                             </div>
                         )}
                     </div>
-                    <div className="fjustify-self-end flex flex-col items-end gap-1">
+                    <div className="justify-self-end flex flex-col items-end gap-1">
+                        <div className="text-sm font-display font-bold text-ink">
+                            {state.submissions.size}/{state.players.size} submitted
+                        </div>
                         <button
                             disabled={!allViewed}
                             onClick={submit}
