@@ -13,8 +13,14 @@ export default function JoinScreen({ connecting, error, onCreate, onJoin}: JoinS
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6">
-            <div className="w-40 h-40 rounded-full bg-sunset border-4 border-ink flex items-center justify-center font-display font-bold text-ink text-xl">
-                Estop
+            <div className="w-40 h-40 relative"
+                 style={{clipPath: "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)"}}>
+                <div className=" absolute inset-0 bg-ink"
+                     style={{clipPath: "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)"}}/>
+                        <div className="absolute inset-1 bg-sunset flex items-center justify-center font-display font-bold text-ink text-4xl"
+                             style={{clipPath: "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)"}}>
+                                Estop
+                        </div>
             </div>
             <div className="w-full max-w-md flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 flex flex-col gap-4">

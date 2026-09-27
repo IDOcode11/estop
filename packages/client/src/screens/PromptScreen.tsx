@@ -177,7 +177,7 @@ export default function PromptScreen({ room }: PromptScreenProps){
                             disabled={!allViewed}
                             onClick={submit}
                             className={`border-2 border-ink px-6 py-3 rounded-lg font-display font-bold text-ink disabled:opacity-50 ${hasSubmitted ? "bg-mint" : "bg-coral"}`}>
-                            STOP
+                            ESTOP
                         </button>
                         {validationError && (
                             <p className="text-coral text-sm font-semibold max-w-45 text-right">

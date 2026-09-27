@@ -41,11 +41,16 @@ export default function LobbyScreen( {room, onLeave}: LobbyScreenProps){
                 Host: {leader?.name ?? "..."}
             </div>
             <div className="w-full max-w-2xl flex justify-center">
-                {guestPlayerEntries.map(([sessionId, player]) => (
-                    <div key={sessionId} className={`bg-white border-2 border-ink rounded-lg px-4 py-3 text-center font-semibold  ${sessionId === room.sessionId ? "text-mint" : "text-ink"}`} >
-                        {player.name}
-                    </div>
-                ))}
+                <div className="grid grid-cols-3 gap-3">
+                    {guestPlayerEntries.map(([sessionId, player]) => (
+                        <div key={sessionId} 
+                             className="bg-white border-2 border-ink rounded-lg px-2 py-2 text-center overflow hidden">
+                            <span className={`text-sm whitespace-nowrap ${sessionId === room.sessionId ? "font font-display font-bold text-mint" : "font-semibold text-ink"}`}>
+                                {player.name}
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </div>
             <div className="w-full max-w-2xl bg-sky/20 border-2 border-ink rounded-lg p-4 flex flex-col sm:flex-row gap-4 justify-center">
                 <label className="flex flex-col items-center gap-1">

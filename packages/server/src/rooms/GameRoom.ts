@@ -248,7 +248,7 @@ export class GameRoom extends Room<RoomState> {
 
     // Handle reconnection window
     try{
-        await this.allowReconnection(client, 15) //Wait 15s 
+        await this.allowReconnection(client, 30) //Wait 30s 
         if(player)
             player.connected = true;
     } catch {
@@ -278,14 +278,19 @@ export class GameRoom extends Room<RoomState> {
    * Starts the alhpabet letter randomizer to choose letter for the round.
    */
   private startRandomizePhase() {
-    // Note: I might add Ñ (Alt+165) later depending user feedback
-    const alphapbet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const alphapbet = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
+
+    if (this.state.usedLetters.length == alphapbet.length){
+      this.state.usedLetters.clear();
+    }
+
     const available = alphapbet.filter(
       (letter) => !this.state.usedLetters.includes(letter)
     );
 
+    //This flag should never run, but here for safety
     if (available.length == 0){
-      throw new Error("No more letters remaining, round count should not exceed 26");
+      throw new Error("No more letters remaining, round count should not exceed 27");
     }
 
     const roundLetter = available[Math.floor(Math.random() * available.length)];
