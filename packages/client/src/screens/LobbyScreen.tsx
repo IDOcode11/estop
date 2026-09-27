@@ -44,7 +44,7 @@ export default function LobbyScreen( {room, onLeave}: LobbyScreenProps){
                 <div className="grid grid-cols-3 gap-3">
                     {guestPlayerEntries.map(([sessionId, player]) => (
                         <div key={sessionId} 
-                             className="bg-white border-2 border-ink rounded-lg px-2 py-2 text-center overflow hidden">
+                             className="bg-white border-2 border-ink rounded-lg px-2 py-2 text-center overflow-hidden">
                             <span className={`text-sm whitespace-nowrap ${sessionId === room.sessionId ? "font font-display font-bold text-mint" : "font-semibold text-ink"}`}>
                                 {player.name}
                             </span>

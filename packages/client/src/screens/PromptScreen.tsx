@@ -114,15 +114,12 @@ export default function PromptScreen({ room }: PromptScreenProps){
     };
 
     const submit = () =>{
-        const isFirstSubmit = state.timerEndsAt === 0;
-
-        if (isFirstSubmit){
-            const hasBlank = answers.some((a) => a.trim().length === 0);
-            if (hasBlank){
-                setValidationError("Fill in every answer before submitting first.")
-                return;
-            }
+        const hasBlank = answers.some((a) => a.trim().length === 0);
+        if (hasBlank){
+            setValidationError("Fill in every answer before submitting first.")
+            return;
         }
+        
         setValidationError(null);
         room.send("submitAnswers", { answers });
         localStorage.removeItem(DRAFT_KEY);
@@ -206,6 +203,7 @@ export default function PromptScreen({ room }: PromptScreenProps){
                             onChange={(e) => updateAnswer(e.target.value)}
                             className="bg-white border-2 border-ink rounded-lg px-4 py-3 text-ink"
                             placeholder={`Starts with "${state.currentLetter}"`}
+                            disabled={hasSubmitted}
                         />
                     </div>
                     <button
